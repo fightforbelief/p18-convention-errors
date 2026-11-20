@@ -1,0 +1,2 @@
+# Historical protocols verify Python source using byte-level SHA-256 on Windows.
+*.py text eol=lf

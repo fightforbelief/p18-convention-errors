@@ -1,465 +1,151 @@
-\documentclass[11pt]{article}
-\usepackage[margin=1in]{geometry}
-\usepackage{amsmath,amssymb,amsthm}
-\usepackage{booktabs}
-\usepackage{xcolor}
-\usepackage{graphicx}
-\usepackage[hidelinks]{hyperref}
-\usepackage{url}
-\usepackage{longtable}
-\usepackage{pgfplots}
+\documentclass[linenumber]{jdsart}
+\usepackage{amsmath,amssymb,booktabs,graphicx,pgfplots}
 \pgfplotsset{compat=1.18}
-
-% Every data-derived number is set in generated/values.tex by scripts/make_paper_values.py.
+\articletype{research-article}
+\nocopyrightline
+% The production template also serves submissions. Omit publisher-assigned metadata.
+\fancypagestyle{copyright}{\fancyhf{}\fancyhead[R]{\thepage}\renewcommand{\headrulewidth}{0pt}}
 \makeatletter
-\newcommand{\setval}[2]{\expandafter\def\csname p18@#1\endcsname{#2}}
-\newcommand{\val}[1]{\ifcsname p18@#1\endcsname\csname p18@#1\endcsname\else\textcolor{red}{\textbf{[\detokenize{#1}]}}\fi}
+\newcommand{\setval}[2]{\expandafter\def\csname pval@#1\endcsname{#2}}
+\newcommand{\val}[1]{\ifcsname pval@#1\endcsname\csname pval@#1\endcsname\else\PackageError{paper}{Missing value #1}{}\fi}
 \makeatother
-\IfFileExists{generated/values.tex}{\input{generated/values.tex}}{}
-\newcommand{\gentable}[1]{\IfFileExists{generated/#1.tex}{{\small\setlength{\tabcolsep}{4pt}\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{\input{generated/#1.tex}}}}{\begin{center}\fbox{\textcolor{red}{\textbf{[table \detokenize{#1} not generated]}}}\end{center}}}
-\newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
-
-\newtheorem{proposition}{Proposition}
-\newtheorem{corollary}{Corollary}
-\theoremstyle{definition}
-\newtheorem{definition}{Definition}
-
-\title{Harmless Here, Biased There:\\ Auditing Silent Composition Changes in Panel Pipelines Without Refitting}
-\author{Hanqing Yang}
-\date{Draft, November 2026}
-
+\input{generated/values}
+\newcommand{\datatable}[1]{{\small\setlength{\tabcolsep}{4pt}\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{\input{generated/#1}}}}
 \begin{document}
-\maketitle
-
+\begin{frontmatter}
+\title{How Calendar and History Filters Change Panel Forecast Comparisons}
+\runtitle{Calendar and History Filters in Forecast Evaluation}
+\author[1]{\inits{Y.}\fnms{Yunjie} \snm{Guo}}
+\author[1]{\inits{H.}\fnms{Hanqing} \snm{Yang}\thanksref{c1}\ead{hanqing.yang189@gmail.com}}
+\thankstext[type=corresp,id=c1]{Corresponding author.}
+\address[1]{Independent Researcher, Suzhou, \cny{China}}
 \begin{abstract}
-Preprocessing for longitudinal panels can silently change which entities are evaluated. The resulting pipelines run without error, pass schema and distribution checks, and produce plausible numbers. We ask when such a composition change only narrows the population a conclusion covers (a \emph{coverage} error) and when it moves the conclusion itself (a \emph{bias} error).
-
-We propose two tools:
-(i) an entity-period ledger that measures retention along life-cycle coordinates (entry cohort, age, exit) relative to a declared reference pipeline;
-(ii) an exact decomposition of a pipeline's effect on any weighted-mean estimand into between-cell composition, within-cell selection, and series alteration.
-For selection-only pipelines the decomposition recovers the full effect, and the full model ranking, from the reference run alone, with no refitting.
-
-We study four U.S.\ Call Report panels and a panel of U.S.\ power plants built from EIA-923 (\val{n-eia_plants} evaluated plants), with every prediction pre-registered. On a held-out panel the ledger flags \val{ledger-prereg-hit} composition pipelines and \val{ledger-prereg-fa} non-composition ones. It flags \val{ledger-full-hits} composition cases with \val{ledger-full-fa} false alarms across all five full panels.
-
-The same line of code that excludes second- and third-quarter entrants from a public forecasting benchmark shifts the headline estimate by \val{b1-bank-range} on the bank panels, but by \val{b1-eia} on power plants. There, entry quarter carries technology mix. Harmlessness is a property of the panel, not of the code. We prove when it holds: the composition term is bounded by the composition shift times outcome heterogeneity along the selected coordinate.
-
-Finally, \val{llm-total-pipes} pipelines written by four LLM families from explicit and under-specified specs show the following. Explicit specs yield exact pipelines (\val{llm-explicit-exact}). Under-specified specs yield silent divergence (\val{llm-under-diverge}; the remaining pipeline crashed loudly). The material divergences trace to a single unstated number, a minimum history length, whose effect we derive in closed form.
+Forecast benchmarks average losses over the series that pass preprocessing. A three-month grid and a calendar-quarter grid can therefore give different answers on the same records. We quantify this effect in four US banking panels and a panel of electricity generation. For a candidate that only removes whole series, reweighting the reference losses recovers the change in any weighted mean and in the ranking of separately fitted forecasters. A decomposition attributes the change to shifts between and within observed groups. The three-month grid removes 2,118 of 11,583 evaluated plants and widens the error advantage of the last-observation forecast over the historical mean by 17.3\% (paired entity-bootstrap interval, 13.3--21.1\%). Across banking panels the magnitude ranges from 0.8\% to 2.6\%. The absolute shift is comparable for plants and bank leverage, but the reference gap is much smaller for plants. Grouping plants by technology accounts for 64\% of the signed shift between groups. All four selection rules preserve the winning forecaster on every panel. Reporting retained counts alongside signed changes in loss reveals which benchmark conclusions depend on a preprocessing convention.
 \end{abstract}
+\begin{keyword}\kwd{forecast accuracy}\kwd{panel data}\kwd{sample selection}\kwd{standardization}\kwd{survivorship}\end{keyword}
+\end{frontmatter}
 
-\noindent\textbf{Keywords:} data preprocessing; sample selection; panel data; forecast evaluation; decomposition; pre-registration; LLM-generated code.
+\section{Introduction}
+A bank first observed on 30 June reports again on 30 September and 31 December. Adding six months to its first date produces 30 December. A join on that date labels an observed quarter as missing. Repeat this operation and an otherwise complete series can fail a coverage screen. Banks that happen to start on 31 March follow a different path through the same code. Each surviving row can have a valid key, date and value, while the evaluation now answers a question about a different population.
 
-% ===========================================================================
-\section{Introduction}\label{sec:intro}
-% ===========================================================================
-Results computed on longitudinal panels, such as ``a random walk is hard to beat on bank ratios'' or ``model A outperforms model B,'' are averages over a set of entities. That set is an output of preprocessing: how dates are placed on a grid, how gaps are handled, how attributes are joined, and which series pass a quality screen. Each step can be locally correct and still change who is in the sample. Such changes leave no trace in the usual checks. The schema is unchanged, the value distribution moves little, and the code runs.
+This example is motivated by quarterly data preparation for the Financial Time Series Forecasting Repository \citep{ftsfr}. We study a controlled implementation in which the grid is the only change. The question is how much the composition of the evaluation sample contributes to the reported gap between two forecasts. A smaller sample can reduce coverage substantially while leaving that gap almost unchanged. Conversely, the gap can move materially while the ranking stays fixed. These possibilities matter when comparing results across benchmarks or deciding whether an analysis has to be rerun.
 
-\paragraph{A motivating case.} In an open financial forecasting benchmark~\cite{bejarano2026}, the quarterly frequency is implemented as a three-month step from each series' first date. From a 30~June or 30~September start, the step lands on 30~December and 30~March, where filings dated the 31st fail to join. The quality screen then removes about a third of the banks that entered after 1976, and the published panel is exactly the panel this grid produces (companion study, in preparation). On the banks that remain, accuracy barely changes. The bug changes \emph{who} is evaluated, not \emph{how well}.
+Existing work describes pitfalls in forecasting evaluation \citep{hewamalage}, automated checks for data quality \citep{schelter}, and the effects of selecting surviving funds on measured performance \citep{elton}. Our accounting uses the standard distinction between group composition and group-specific outcomes \citep{kitagawa}. Its application here requires two choices. First, we compare a candidate with a declared reference that already applies legitimate quality screens. Second, we hold the reference loss of each retained entity fixed to measure selection, then isolate any residual change requiring a new evaluation. The resulting calculation can be done for each pair of forecasters, even when selection leaves the identity of the winner unchanged.
 
-\paragraph{The question.} When is a silent composition change harmless, and how can one tell without rerunning every model? We separate three error classes (Section~\ref{sec:setup}):
-\begin{itemize}
-\item \emph{coverage errors}: the evaluated population shrinks or shifts, but the estimand does not move materially;
-\item \emph{bias errors}: the population changes and the estimand moves;
-\item \emph{alteration errors}: retained series are themselves changed.
-\end{itemize}
+\section{Panels, pipelines and outcomes}\label{sec:data}
+The banking data are quarterly US Call Report series from 1976 through 2020, based on the consistent historical files of \citet{drechsler}. We examine assets divided by equity and cash divided by assets for individual banks and bank holding companies (BHCs). BHC ratios use sums of the component amounts of reporting banks within each holding company and date. The two variables and two aggregation levels provide sensitivity comparisons within one reporting system. The second domain is quarterly net electricity generation by US plant, from the EIA-923 series and its predecessor files for 2001--2024. We sum reported monthly generation within each plant and quarter and trim leading and trailing quarters without nonzero generation. Entry thus means first observed activity in this window. Of 15,131 plants in the constructed panel, \val{n-eia_plants} qualify for reference evaluation. All four banking panels and their denominators appear in Table~\ref{tab:grid}.
 
-\paragraph{Findings.}
-\begin{enumerate}
-\item \textbf{Standard checks are blind; a differential ledger is not.} Schema checks fire on \val{schema-fires} of 14 pipeline variants. Our entity-period ledger, frozen before the test, flags \val{ledger-prereg-hit} composition pipelines and \val{ledger-prereg-fa} non-composition ones on a held-out panel. On all five full panels it catches \val{ledger-full-hits} composition cases with \val{ledger-full-fa} false alarms (Section~\ref{sec:ledger}).
-\item \textbf{The effect of a selection-only bug is computable without refitting.} The decomposition is an identity (Proposition~\ref{prop:identity}). For every selection bug on every panel and three estimands, the alteration term is exactly zero, and the no-refit forecast of the full six-model ranking is exact in \val{rank-forecast-exact} cases (Section~\ref{sec:exact}).
-\item \textbf{The same bug is a coverage error on banks and a bias error on power plants.}
-  \begin{itemize}
-  \item On the bank panels the benchmark's grid bug moves the headline by \val{b1-bank-range}, although it reweights up to \val{b1-bank-tv-max} of entry-cohort mass.
-  \item On \val{n-eia_plants} evaluated power plants it moves it by \val{b1-eia}, with harm ratio \val{b1-eia-harm}.
-  \item The reason is outcome heterogeneity along entry quarter. Proposition~\ref{prop:bound} turns this into a bound computable from the reference run.
-  \item For plants the heterogeneity is mostly technology mix: solar is \val{solar-q1} of first-quarter entrants and \val{solar-q4} of fourth-quarter entrants (Section~\ref{sec:flip}).
-  \end{itemize}
-\item \textbf{Rankings are robust to selection and fragile to alteration.} Selection bugs never flip a significant pairwise model comparison (\val{rank-flips-sel} bug--panel cases). Alteration bugs flip at least one in \val{rank-flips-alt} bug--panel cases (Section~\ref{sec:exact}).
-\item \textbf{LLM-written pipelines make convention errors only when conventions are unstated.} Across \val{llm-total-pipes} pipelines from four model families and three tasks:
-  \begin{itemize}
-  \item explicit specs produce exact pipelines (\val{llm-explicit-exact});
-  \item under-specified specs produce silent divergence (\val{llm-under-diverge}; one crashed loudly);
-  \item no pipeline falls for a planted survivorship trap;
-  \item every material divergence traces to one unstated minimum-history threshold, whose effect is given in closed form by Proposition~\ref{prop:minlen} (Section~\ref{sec:llm}).
-  \end{itemize}
-\end{enumerate}
-All \val{prereg-total} predictions were frozen with code hashes before the corresponding runs. \val{prereg-pass} passed, \val{prereg-fail} failed and \val{prereg-vacuous} were vacuous. We report every outcome (Appendix~\ref{app:prereg}). Several failures carry the paper's most useful results.
+The reference grid runs between the first and last observation of each entity at calendar quarter ends. It permits at most 20\% missing quarters and drops the remaining missing observations. The three-month grid (B1) instead uses each first date plus an integer multiple of three months. Series that start in June or September miss subsequent March and December quarter ends. At the lengths used for evaluation, these series fail the coverage screen. For the other start months the grids coincide. We also consider a join restricted to the last snapshot, a rule requiring activity in the final year, a history-length filter, and alterations such as forward filling. Appendix~\ref{app:catalogue} gives the operations.
 
-% ===========================================================================
-\section{Related work}\label{sec:related}
-% ===========================================================================
-\paragraph{Data validation.} Production systems validate schemas, value ranges and distributional drift~\cite{breck2019,schelter2018}. These checks operate on values. A composition change that keeps the value distribution stable passes them; our baselines implement exactly these checks.
+For entity \(i\) we hold out its last four available observations. We require at least 16 observations overall and a positive mean absolute first difference in the training series. Thus the four test observations need not span four consecutive calendar quarters when the retained history has gaps. Mean absolute scaled error (MASE) divides mean absolute test error by this training scale \citep{hyndman}. Our primary outcome \(a_i\) is MASE of the last-observation forecast minus MASE of the training mean. Negative values favor the last observation. The primary estimand, \(\theta\), gives equal weight to entities. We report signed shifts in MASE units and divide by \(\lvert\theta_r\rvert\) for relative shifts, where \(r\) denotes the reference. The study protocol calls a change material when its magnitude reaches 10\% of the reference gap. This cutoff is an interpretive convention and presupposes a nonzero reference gap.
 
-\paragraph{Leakage and reproducibility.} Leakage taxonomies~\cite{kapoor2023} target train--test contamination. Our alteration class overlaps with them; coverage and bias errors do not.
+Two secondary outcomes assess dependence on the estimand. We rank six entity-level forecasts by mean MASE: last observation, historical mean, seasonal naive (period four), drift, last-four mean, and simple exponential smoothing with its smoothing coefficient selected by training squared error. We also compute a pooled lag-one persistence statistic using the sum of within-entity lag products divided by the sum of squared centered lags, centering both series by each entity's full-series mean. For this statistic, the reference weights are squared-lag sums. The financial leverage ratios make those weights highly concentrated.
 
-\paragraph{Forecast benchmarks.} Benchmarks such as M4~\cite{makridakis2020} and the Monash archive~\cite{godahewa2021} fix data, horizons and metrics. Reviews of evaluation practice stress undocumented preprocessing~\cite{tashman2000,hewamalage2023}, and recent work shows preprocessing can confound model comparisons~\cite{preproc2026,moretti2026}. We study preprocessing that changes \emph{which} series are evaluated.
+\section{Auditing a change in sample}\label{sec:method}
+\subsection{Checking keys and retention}
+The ledger compares candidate and reference processing against the same raw keys. It flags a candidate when a processed key has no raw counterpart, when its fraction of raw keys retained falls below half that of the reference, or when a retention spread exceeds the corresponding reference spread by more than 0.10. A spread is the maximum minus minimum retention rate across groups. Entity and key retention are checked by entry group and exit status. Key retention is also checked by age in years, capped at five. Entry group records both presence at the start of the panel and the calendar quarter of the first observation. Exit status records presence at the panel's final quarter.
 
-\paragraph{Selection and decomposition.} Our setting is non-random sample selection~\cite{heckman1979}, including survivorship~\cite{elton1996}. The decomposition is a pipeline analogue of Kitagawa and Oaxaca--Blinder decompositions~\cite{kitagawa1955,oaxaca1973,blinder1973}: we decompose the difference between two pipelines on the same raw data, not between two populations.
+An earlier ledger compared directly with raw retention. On a development subsample its flags included the benign reshuffle, because the reference screen itself changed retention. We fixed the differential version and logged predictions for fourteen variants before testing it on a 4,000-entity BHC-leverage subsample. The eight expected flags and six expected nonflags were all observed. The same pattern held on the five full panels. These counts measure agreement with specified test cases. They do not estimate sensitivity or specificity over naturally occurring pipeline errors. The prespecified schema check (columns, nonmissing values, unique keys, quarter-end dates) flagged none of the fourteen variants in the held-out subsample. Row-count and marginal-distribution checks can flag severe attrition, but do not identify which groups account for it.
 
-\paragraph{Agentic data science.} Recent work audits LLM data-science agents for silent failures and analytic flexibility. \todo{add verified citations: agentic DS sanity checks, ``fail loudly'' harness, many-analysts studies}. Our LLM study isolates one mechanism, under-specified conventions, and measures its effect on composition.
+\subsection{Attributing a change in the estimand}\label{sec:identity}
+Let \(S_r\) and \(S_p\) be the evaluated reference and candidate sets. The reference has contributions \(a_i\) and positive weights \(w_i\). Let \(K=S_r\cap S_p\) have positive weight and let \(\theta_K\) be the reference weighted mean on \(K\). For a partition of \(S_r\), write \(W_{rc}\) and \(W_{kc}\) for normalized reference weight in cell \(c\) in the full and retained populations, respectively. Write \(\mu_{rc}\) and \(\mu_{kc}\) for the corresponding cell means, taking \(\mu_{kc}=\mu_{rc}\) in empty retained cells. Adding and subtracting \(\sum_c W_{kc}\mu_{rc}\) gives
+\begin{equation}
+\theta_p-\theta_r =
+\underbrace{\sum_c(W_{kc}-W_{rc})\mu_{rc}}_{T_1}
++\underbrace{\sum_cW_{kc}(\mu_{kc}-\mu_{rc})}_{T_2}
++\underbrace{\theta_p-\theta_K}_{T_3}. \label{eq:decomp}
+\end{equation}
+The first term measures redistribution between cells. The second measures selection within cells. The residual includes changes to retained outcomes or weights and entities newly admitted by the candidate. The primary partition crosses entry group with exit status. Changing the partition redistributes \(T_1\) and \(T_2\) while preserving their sum. If no entity is retained, the ledger still reports the loss of coverage, but this decomposition is undefined.
 
-% ===========================================================================
-\section{Setup}\label{sec:setup}
-% ===========================================================================
-A \emph{panel} is a set of (entity, period, value) records. A \emph{pipeline} maps raw records to processed records. An \emph{evaluator} maps processed records to per-entity contributions $a_i$ and weights $w_i>0$. The \emph{estimand} is $\theta=\sum_{i\in S} w_i a_i/\sum_{i\in S} w_i$ over the evaluated set $S$.
+For a candidate that only removes complete entities, \(K=S_p\). If retained series, weights and evaluation windows are unchanged and models are fit separately to each entity, then \(\theta_p=\theta_K\) and \(T_3=0\). A new set of eligible IDs and cached reference scores suffice to compute the change, including all pairwise mean-loss gaps. Refitting a global model on a changed training panel generally invalidates this argument. Removing dates within a retained history can also change its forecast or its scale.
 
-We use three estimands:
-\begin{itemize}
-\item \textbf{E1:} the mean per-entity difference $\mathrm{MASE}(\text{Naive})-\mathrm{MASE}(\text{HistoricAverage})$ at horizon~4~\cite{hyndman2006};
-\item \textbf{E2:} the pooled within-entity AR(1) slope, a weighted mean with weights $S^{xx}_i$;
-\item \textbf{E3:} the ranking of six forecasters, a function of 15 E1-type pairwise gaps.
-\end{itemize}
+Define total variation \(V=\tfrac12\sum_c|W_{kc}-W_{rc}|\). The sum of positive weight changes equals the absolute sum of negative changes, both equal to \(V\). Hence
+\begin{equation}
+ |T_1|\le V\,(\max_c\mu_{rc}-\min_c\mu_{rc}). \label{eq:bound}
+\end{equation}
+If weight moves between groups with equal mean losses the contribution vanishes. The bound concerns \(T_1\) alone. Substantial within-cell selection is possible even when the retained group shares match the reference. Appendix~\ref{app:bounds} gives the complementary bound for \(T_2\).
 
-\emph{Cells} are life-cycle coordinates computed from raw data only:
-\begin{itemize}
-\item entry cohort (incumbent, or entrant by calendar quarter of first record);
-\item exit status;
-\item age.
-\end{itemize}
-A \emph{reference} pipeline $r$ is declared. Candidates $p$ are judged relative to it.
-
-\begin{definition}[Error classes]
-A \emph{composition change} retains entity-periods non-uniformly across cells relative to $r$. It is a \emph{bias error} for an estimand if $|\theta_p-\theta_r|\ge 0.10\,|\theta_r|$ (E1), or $\ge 0.10\,(1-\theta_r)$ (E2), or if the top-ranked model changes (E3). Otherwise it is a \emph{coverage error}. An \emph{alteration error} changes retained values or the evaluator's inputs for retained entities.
-\end{definition}
-
-The materiality threshold is stated relative to the effect, not to its confidence interval, because CI-based harm grows with sample size. The motivating bug's harm ratio on bank leverage rose from \val{b1-harm-sub} on a 4{,}000-bank subsample to \val{b1-harm-full} on the full panel, while its relative shift stayed at \val{b1-rel-full-bl}.
-
-% ===========================================================================
-\section{Method}\label{sec:method}
-% ===========================================================================
-\subsection{Entity-period ledger}\label{sec:ledger-method}
-The ledger compares raw, reference and candidate keys. It needs no model. It flags a candidate if any of three rules fails:
-\begin{description}
-\item[R1, key provenance:] every processed (entity, period) key exists in raw. Values are not checked.
-\item[R2, retention floor:] the candidate keeps at least half the reference's entity-periods.
-\item[R3, differential uniformity:] for each coordinate and for entity and entity-period retention, the candidate's retention spread minus the reference's is at most $0.10$.
-\end{description}
-
-A first version compared retention against raw data. On real panels it raised false alarms on all 14 variants, because legitimate quality screens are themselves non-uniform. The differential design was frozen after that failure and before any held-out test. We report both versions.
-
-\subsection{Decomposition}\label{sec:decomp}
-Let $K=S_p\cap S_r$. Let $W_{rc}$, $\mu_{rc}$ be the reference cell weights and means, and $W_{kc}$, $\mu_{kc}$ their counterparts over $K$, computed with \emph{reference} values. Let $\theta_{\mathrm{sel}}$ be the reference-valued estimand over $K$. Define
-\[
-T_1=\sum_c (W_{kc}-W_{rc})\mu_{rc},\quad
-T_2=\sum_c W_{kc}(\mu_{kc}-\mu_{rc}),\quad
-T_3=\theta_p-\theta_{\mathrm{sel}}.
-\]
-Computing $T_1+T_2$ needs only the reference per-entity results and the candidate's evaluated set. The evaluated set is obtained from the processed panel by applying the evaluator's per-entity filter.
-
-\begin{proposition}[Identity and no-refit forecast]\label{prop:identity}
-$\theta_p-\theta_r=T_1+T_2+T_3$. If the candidate only removes entities or entity-periods and leaves retained series unchanged, and each entity's evaluation depends only on its own series, then $T_3=0$. The candidate's estimand, and any ranking defined by pairwise weighted-mean gaps, is then computable from the reference run without refitting.
-\end{proposition}
-
-\begin{proposition}[Composition bound]\label{prop:bound}
-Let $\mathrm{TV}=\tfrac12\sum_c|W_{kc}-W_{rc}|$, let $\chi^2=\sum_c W_{rc}(W_{kc}/W_{rc}-1)^2$, and let $\sigma_B$ be the $W_r$-weighted standard deviation of the cell means. Then
-\[
-|T_1|\le \mathrm{TV}\cdot\big(\max_c\mu_{rc}-\min_c\mu_{rc}\big)
-\qquad\text{and}\qquad
-|T_1|\le\sqrt{\chi^2}\,\sigma_B .
-\]
-The first bound is sharp. If $\mu_{rc}$ is constant on the cells whose weight changes, then $T_1=0$, however large the composition shift.
-\end{proposition}
-
-\begin{proposition}[Within-cell selection]\label{prop:within}
-With retention rate $\pi_c$ and within-cell standard deviation $\sigma_{rc}$,
-\[
-|T_2|\le\sum_c W_{kc}\,\sigma_{rc}\sqrt{(1-\pi_c)/\pi_c},
-\]
-and $T_2=0$ when retention is constant within cells.
-\end{proposition}
-
-\begin{proposition}[Minimum-length filters]\label{prop:minlen}
-Suppose the evaluator requires history length $n\ge L_0$ and a candidate requires $n\ge L$. Then the shift is $0$ for $L\le L_0$, and for $L>L_0$
-\[
-\theta(L)-\theta_r=(1-\pi_L)\,(\mu_{\ge L}-\mu_{<L}),
-\]
-where $\pi_L$ is the retained weight share. The shift is monotone in $L$ if $\mathbb E[a\mid n]$ is monotone in $n$.
-\end{proposition}
-
-Proofs are in Appendix~\ref{app:proofs}. We checked all four propositions numerically on every panel:
-\begin{itemize}
-\item the identity and the bounds of Propositions~\ref{prop:bound}--\ref{prop:within} hold in \val{prop-all-hold} \val{prop-cases} bug--panel cases;
-\item the closed form of Proposition~\ref{prop:minlen} matches \val{prop4-cases} measured shifts to within \val{prop4-maxerr}.
-\end{itemize}
-Proposition~\ref{prop:identity} also states the scope limit. Alterations change $a_i$ for retained entities, so no function of the reference run can recover their effect. The ledger and decomposition do not audit them.
-
-% ===========================================================================
-\section{Data and protocol}\label{sec:data}
-% ===========================================================================
-\paragraph{Panels.} We use four quarterly U.S.\ Call Report panels, 1976--2020, built as in the benchmark: bank leverage, bank cash liquidity, BHC leverage and BHC cash liquidity~\cite{drechsler2017}.
-
-For a domain outside banking we build a plant-quarter panel of net generation from the 24 annual EIA-923 files, 2001--2024:
-\begin{itemize}
-\item a plant enters at its first non-zero quarter and exits after its last;
-\item plant technology comes from EIA-860 (2024), using each plant's largest generator.
-\end{itemize}
-Evaluated entities in the reference pipeline: \val{n-bank_leverage}, \val{n-bank_cash_liquidity}, \val{n-bhc_leverage}, \val{n-bhc_cash_liquidity} and \val{n-eia_plants}.
-
-\paragraph{Pipelines.}
-\begin{itemize}
-\item A design set B1--B5, written while the ledger was developed. It includes the benchmark's grid step (B1).
-\item A held-out set x1--x9, written after the ledger was frozen, from documented pitfalls: offset anchoring, current-constituent survivorship, many-to-many links, target-shift \texttt{dropna}, winsorizing, z-scoring, and benign controls.
-\item \val{llm-total-pipes} LLM-written pipelines (Section~\ref{sec:llm}).
-\item A 16-configuration factorial ablation of the conventions the LLMs chose.
-\end{itemize}
-Appendix~\ref{app:bugs} lists each pipeline.
-
-\paragraph{Pre-registration and execution.} Before each experiment we froze, in an append-only ledger with SHA-256 hashes and timestamps:
-\begin{itemize}
-\item the code;
-\item the predictions;
-\item the pass criteria.
-\end{itemize}
-Deviations are logged as D1--D5. All reported numbers come from one runner on a dedicated machine (Python \val{py-version}, pandas \val{pandas-version}). It reproduces an earlier development run of every result file to within $2\times10^{-10}$ relative. A full run takes \val{runtime-bank-min} minutes on the bank panels and \val{runtime-eia-min} minutes on the power-plant panel.
-
-% ===========================================================================
-\section{Results}\label{sec:results}
-% ===========================================================================
-\subsection{Standard checks miss composition changes; the ledger does not}\label{sec:ledger}
-Schema checks fire on \val{schema-fires} of 14 variants. Distribution checks (row retention, mean shift, KS) confuse legitimate screens with bugs: on real panels the reference pipeline itself fails them.
-
-In the pre-registered held-out test (BHC leverage), ledger v1 flagged all 8 composition pipelines and none of the 6 non-composition or benign ones (\val{ledger-prereg}). On the five full panels it catches \val{ledger-full-hits} composition cases with \val{ledger-full-fa} false alarms. By design it misses alterations: the scale leak (B5), a target shift (x5) and winsorizing (x7).
-
+\section{Results}
+\subsection{Calendar anchoring and the scale of the comparison}
 \begin{table}[t]
-\centering
-\caption{Relative E1 shift (\%) by pipeline and panel. \textbf{Bold}: material ($\ge10\%$). $^{\ell}$: flagged by ledger v1. Shifts above 100\% mean the sign of the headline changes.}\label{tab:design}
-\gentable{tab_design}
+\caption{Effect of the three-month grid on the last-observation minus historical-mean MASE gap. Relative shifts and their paired entity-bootstrap intervals are percentages of the absolute reference gap.}\label{tab:grid}
+\centering\datatable{tab_grid}
 \end{table}
+The grid removes about two fifths of the evaluated holding companies and about one sixth of evaluated plants (Table~\ref{tab:grid}). The largest relative change is on plants: the gap moves from \(-0.246\) to \(-0.289\), increasing the advantage of the last-observation forecast. Bank leverage has a slightly larger absolute shift, \(-0.050\), from a reference gap of \(-2.979\). The small denominator on plants is therefore important to the cross-domain difference. The two BHC estimates move toward zero despite the greater attrition.
 
-\subsection{The same bug: coverage on banks, bias on power plants}\label{sec:flip}
-Table~\ref{tab:design} and Figure~\ref{fig:tv} show the central contrast.
-\begin{itemize}
-\item \textbf{Survivorship} (B2, x3) is a bias error everywhere: \val{surv-bank-range} on banks and \val{surv-eia-range} on plants.
-\item \textbf{The benchmark's grid bug} (B1) reweights entry cohorts by a total-variation distance of \val{b1-bank-tv-range} on banks, yet moves E1 only \val{b1-bank-range}. We pre-registered that it would be harmful on the cash panels; that prediction failed.
-\item \textbf{On power plants the same code} moves E1 by \val{b1-eia} (TV \val{b1-eia-tv}, harm ratio \val{b1-eia-harm}), entirely through selection. We pre-registered that it would be harmless there; that prediction failed too.
-\end{itemize}
+We added paired percentile intervals after the main experiments to quantify sensitivity to the mix of entities. Within each panel, we resampled reference entities with replacement 4,000 times, carrying each entity's reference loss and retention indicator together, and recomputed both means and the signed relative shift. The observed means and counts were checked against both original pipeline runs. The four banking intervals lie within the prespecified materiality band. The plant interval lies entirely below its lower boundary. At a 20\% threshold the plant point estimate would also fall below the cutoff. These are marginal intervals under exchangeable entity sampling. They do not capture common calendar shocks, geographic dependence, or links between banks in the same holding company. For the observed panels the shifts themselves are finite-population calculations.
 
-Proposition~\ref{prop:bound} explains both failures. On banks, entry-quarter cohorts have nearly equal mean outcomes, so $\sigma_B$ is small and the bound is loose but small: at most \val{b1-bank-bound2b-max}. On plants the cohorts differ. The mean $a_i$ is \val{d-inc-eia} for incumbents, \val{d-q12-eia} for first- and second-quarter entrants, and \val{d-q34-eia} for later entrants. The bound reaches \val{b1-eia-bound2b}, against an actual $|T_1|$ of \val{b1-eia-T1}.
+\subsection{Why the plant sample changes}
+For the grid rule, an entity's starting calendar quarter determines whether it is retained. With entry group included in the partition, the between-cell term accounts for the full shift on each panel. On plants the reference mean gap is \val{d-inc-eia} for incumbents. Among entrants it averages \val{d-q12-eia} for Q1--Q2 starts and \val{d-q34-eia} for Q3--Q4 starts. The grid excludes Q2 and Q3 entrants and keeps the incumbents. Both their loss profiles and their weights enter equation~\eqref{eq:decomp}.
 
+We examined whether plant technology accounts for this pattern. The 2024 EIA-860 generator inventory supplies a technology for \val{tech-matched} of evaluated plants, using the largest generator by nameplate capacity and retaining an unmatched category. Technology labels outside the named categories are pooled into an additional other group. The solar share rises from \val{solar-q1} of Q1 entrants to \val{solar-q4} of Q4 entrants. Among entrants, adding technology indicators to a regression of the gap on entry quarter reduces the range of quarter coefficients from \val{mech-spread-none} to \val{mech-spread-tech}, a \val{mech-reduction} reduction against an advance prediction of at least 50\%. Entry-year indicators alone reduce it to \val{mech-spread-year}. With both technology and year, the joint quarter test gives \(p=\val{mech-p-techyear}\). This is a nominal descriptive test using an ordinary least-squares F statistic.
+
+Grouping the full reference population by technology assigns \(-0.0271\) of the \(-0.0426\) shift to changing technology weights and \(-0.0155\) to selection within technologies. The between-technology share, \val{mech-b1-tech-share}, is an accounting result conditional on the partition. Technology recorded in 2024 is an imperfect proxy for a plant's technology at first observation. This exercise does not identify the causal effect of technology or season of entry.
+
+\subsection{Other rules and outcomes}
+\begin{table}[t]
+\caption{Absolute relative change in the primary gap (\%). Bold values reach the 10\% materiality threshold. A superscript \(\ell\) indicates a ledger flag.}\label{tab:design}
+\centering\datatable{tab_design}
+\end{table}
+Requiring membership in a final snapshot or activity in the final year changes the primary gap by \val{surv-bank-range} across banking panels and \val{surv-eia-range} on plants (Table~\ref{tab:design}). A minimum of 40 quarters produces large changes on plants and BHC cash but a 4.4\% change on bank leverage. For these three rules and the grid rule, restricting the reference scores recovers the rerun ranking in \val{rank-forecast-exact} comparisons. None changes the winning model. This result concerns six separately fitted forecasters at one horizon.
+
+Forward filling a balanced panel also changes the trajectories supplied to forecasters. On plants its absolute shift exceeds 100\%: the magnitude of the original gap more than doubles in the same direction. The ledger detects the added keys but cannot measure this alteration from reference losses alone. In the secondary persistence statistic one entity accounts for \val{e2-top1-share-bhc} of total weight on BHC leverage and \val{e2-top1-share-bank} on bank leverage. The study therefore reports these values as a diagnostic of weight concentration and restricts substantive persistence comparisons to the cash panels. An audit should report the effective concentration of weights whenever it differs markedly from the fraction of entities retained.
+
+\subsection{Minimum history as a sensitivity parameter}
+Let \(n\) be the number of observations in the reference series. Raising the evaluation minimum from \(L_0=16\) to \(L>L_0\) removes some short histories. With \(\pi_L\) the retained reference weight and \(\mu_{\ge L},\mu_{<L}\) the two group means, conditioning on the filter gives
+\begin{equation}
+\theta(L)-\theta_r=(1-\pi_L)(\mu_{\ge L}-\mu_{<L}). \label{eq:length}
+\end{equation}
+If the retained set is unchanged the shift is zero. For positive mass on each side, both factors can be estimated directly from the reference scores. With monotone weighted conditional means by length, the retained tail mean is monotone as well. Monotonicity is an empirical question in other panels.
+
+Figure~\ref{fig:length} uses a second, task-specific reference that includes a synthetic point-in-time eligibility attribute independent of the outcome. It varies only the length filter, retaining the same eligible observations and evaluator. It therefore has a different denominator from Table~\ref{tab:design}. Requiring 24 quarters changes the gap by \val{minlen-l24-bank-range} on banking panels and by \val{minlen-l24-eia} on plants. At 48 quarters the change reaches \val{minlen-l48-eia} on plants. Across 50 panel--threshold comparisons, the analytic and rerun shifts agree to machine precision. The banking sweep was exploratory. Its monotone direction was predicted in advance for plants.
 \begin{figure}[t]
 \centering
-\IfFileExists{generated/fig_tv.dat}{%
 \begin{tikzpicture}
-\begin{axis}[width=0.6\linewidth,height=6cm,xlabel={Entry-cohort composition shift (TV)},ylabel={Relative E1 shift (\%)},
-  ymode=log,ymin=0.5,ymax=100,xmin=0,xmax=0.85,legend style={font=\footnotesize,at={(1.03,1)},anchor=north west},
-  extra y ticks={10},extra y tick style={grid=major,grid style={dashed,gray}}]
-\addplot[only marks,mark=o,gray] table[x=tv,y=shift,restrict expr to domain={2*\thisrow{isb1}+\thisrow{iseia}}{0:0}]{generated/fig_tv.dat};
-\addlegendentry{B2, x3, x4 on bank panels}
-\addplot[only marks,mark=triangle,orange,thick] table[x=tv,y=shift,restrict expr to domain={2*\thisrow{isb1}+\thisrow{iseia}}{1:1}]{generated/fig_tv.dat};
-\addlegendentry{B2, x3, x4 on power plants}
-\addplot[only marks,mark=*,blue] table[x=tv,y=shift,restrict expr to domain={2*\thisrow{isb1}+\thisrow{iseia}}{2:2}]{generated/fig_tv.dat};
-\addlegendentry{B1 on bank panels}
-\addplot[only marks,mark=square*,red] table[x=tv,y=shift,restrict expr to domain={2*\thisrow{isb1}+\thisrow{iseia}}{3:3}]{generated/fig_tv.dat};
-\addlegendentry{B1 on power plants}
+\begin{axis}[width=.94\linewidth,height=6cm,xmin=15,xmax=49,ymin=0,ymax=90,
+xlabel={Required observations per entity},ylabel={Absolute relative shift (\%)},
+xtick={16,20,24,28,32,40,48},ytick={0,20,40,60,80},ymajorgrids,grid style={gray!25},
+legend style={at={(0.015,.98)},anchor=north west,font=\footnotesize,draw=none,fill=white},legend columns=2]
+\addplot[thick,blue!65!black,mark=square*,mark size=1.3pt] table[x=L,y=bank_leverage]{generated/fig_minlen.dat};\addlegendentry{Bank leverage}
+\addplot[thick,teal!75!black,mark=triangle*,mark size=1.6pt] table[x=L,y=bank_cash_liquidity]{generated/fig_minlen.dat};\addlegendentry{Bank cash}
+\addplot[thick,blue!65!black,densely dashed,mark=square,mark size=1.5pt] table[x=L,y=bhc_leverage]{generated/fig_minlen.dat};\addlegendentry{BHC leverage}
+\addplot[thick,teal!75!black,densely dashed,mark=triangle,mark size=1.6pt] table[x=L,y=bhc_cash_liquidity]{generated/fig_minlen.dat};\addlegendentry{BHC cash}
+\addplot[very thick,red!60!black,mark=*,mark size=1.6pt] table[x=L,y=eia_plants]{generated/fig_minlen.dat};\addlegendentry{Power plants}
 \end{axis}
-\end{tikzpicture}}{\fbox{\textcolor{red}{[fig\_tv.dat not generated]}}}
-\caption{Composition shift does not predict harm. Each point is a selection bug on a full panel. The dashed line marks the 10\% materiality threshold. The grid bug B1 moves up to \val{b1-bank-tv-max} of entry-cohort mass on banks without material effect, but crosses it on power plants at a TV of \val{b1-eia-tv}, inside the bank range (\val{b1-bank-tv-range}), because there entry cohorts differ in outcome (Proposition~\ref{prop:bound}).}\label{fig:tv}
+\end{tikzpicture}
+\caption{Effect of increasing minimum history, relative to the gap at 16 observations in the task-specific reference. Markers show evaluated thresholds and lines connect adjacent measurements.}\label{fig:length}
 \end{figure}
 
-\paragraph{Mechanism.} Entry quarter carries technology mix on plants (pre-registered M1--M5, three of five pass):
-\begin{itemize}
-\item The solar share of entrants rises from \val{solar-q1} (Q1) to \val{solar-q4} (Q4).
-\item Technology fixed effects cut the entry-quarter outcome gap by \val{mech-reduction}, from \val{mech-spread-none} to \val{mech-spread-tech}; we predicted at least 50\%.
-\item History length explains less: the gap is \val{mech-spread-year} with entry-year effects.
-\item In the decomposition with technology cells, \val{mech-b1-tech-share} of the bug's selection effect is between technologies.
-\item A residual within-technology effect remains ($p=\val{mech-p-techyear}$).
-\end{itemize}
-The claim we can support is ``mostly technology composition,'' not full identification.
+\section{Discussion}
+For a forecaster deciding whether to rerun an evaluation, the first question is whether the candidate changes retained training or test values. If it only removes whole series and each model fits locally, publishing per-entity losses and the membership indicator is enough to recover the new mean and ranking. Reporting relative change beside the signed change and both denominators makes the result interpretable when the original gap is small. For a change in values or model training, direct evaluation is needed to measure the residual.
 
-\paragraph{Implication.} A convention bug cannot be certified harmless by reading the code. Harmlessness depends on whether the dropped coordinate is outcome-relevant in the panel at hand. Proposition~\ref{prop:bound} gives a check that needs only the reference run.
+The reference specifies the target population; accuracy on a population absent from the raw files remains unidentified. A ledger flag describes a difference even when the candidate implements a legitimate restriction, and uniform losses in unmeasured groups can escape its spread check. The four financial panels share reporting institutions, and the electricity data provide only one cross-domain replication. The design measures sensitivity to specific conventions on these five panels. It does not estimate the prevalence of such conventions in forecasting practice.
 
-\subsection{The decomposition is exact; rankings resist selection, not alteration}\label{sec:exact}
-For the four selection bugs, on all five panels and all three estimands:
-\begin{itemize}
-\item the alteration term is exactly zero (largest $|T_3|$: \val{t3-max-sel});
-\item the no-refit forecast of the six-model ranking matches the refitted ranking in \val{rank-forecast-exact} cases.
-\end{itemize}
-No selection bug changed the top-ranked model or flipped a significant pairwise comparison (\val{rank-flips-sel} of 20 bug--panel cases). Alteration bugs flipped at least one comparison in \val{rank-flips-alt} of 20: B3 forward-fill, the B5 scale leak, the x5 target shift and x7 winsorizing.
+The repository preserves the dated protocol, code hashes, deviations and unsuccessful predictions. These are project-maintained records, rather than an independently time-stamped registry. The banking and electricity panels contradicted opposite predictions about the grid rule: the development work anticipated a larger effect on cash ratios, while the electricity study predicted a sub-threshold shift. In both settings the observable membership changes and reference losses suffice to explain the realized direction and magnitude.
 
-The audit is therefore complete for level estimands under selection. Comparative claims additionally need alteration checks, which no composition audit can provide (Proposition~\ref{prop:identity}).
+\section*{Data and code availability}
+The replication materials include scored entity-level data for the calendar comparison, the paired resampling script, original experiment outputs, panel construction details and the dated protocol. The EIA source manifest lists annual files and hashes. The README documents reconstruction from the NYU Call Reports and EIA public releases. The version accompanying this manuscript is maintained at \url{https://github.com/fightforbelief/p18-convention-errors}.
 
-\paragraph{A fragile reference.} On both leverage panels the persistence estimand E2 is degenerate: one holding company carries \val{e2-top1-share-bhc} of the weight on BHC leverage (one bank carries \val{e2-top1-share-bank} on bank leverage). Composition shifts then register mostly in weight space: for the grid bug on BHC leverage, the cohort TV is \val{e2-b1-tv-bhc} with E2 weights but \val{e1-b1-tv-bhc} with the unit weights of E1. The decomposition makes the fragility of the \emph{reference} visible. Here winsorizing, nominally a bug, is arguably the fix.
-
-\subsection{LLM-written pipelines}\label{sec:llm}
-\paragraph{Design.}
-\begin{itemize}
-\item Four model families: Claude Haiku, Sonnet and Opus, and OpenAI \texttt{gpt-6.2-sol} through the \texttt{codex} CLI.
-\item Three tasks:
-  \begin{enumerate}
-  \item a level panel with a point-in-time charter filter and gap handling;
-  \item a year-over-year change panel;
-  \item a regional panel whose inputs include an end-of-sample directory that lists only survivors.
-  \end{enumerate}
-\item Each task has an explicit spec that states every convention, and an under-specified spec in an analyst's words.
-\end{itemize}
-Each run saw only the spec and a synthetic sample, in an isolated folder. Pipelines were run on all five full panels.
-
-\begin{table}[t]
-\centering
-\caption{LLM-written pipelines, pooled over five panels. Pipeline counts are per pipeline; ledger flags and material cells are per pipeline $\times$ panel. In task~3 one Codex pipeline crashed (loudly) on every panel: it filled missing end dates with $\infty$, which the sample CSV tolerated but the production column type did not.}\label{tab:llm}
-\gentable{tab_llm}
-\end{table}
-
-\paragraph{Findings (Table~\ref{tab:llm}).}
-\begin{enumerate}
-\item \textbf{Specification, not coding.} Explicit specs gave exact pipelines (\val{llm-explicit-exact}). The textbook coding traps never occurred: no pipeline lagged by row position or used a percent change where a difference was meant.
-\item \textbf{Conventions cluster within a family and differ across families.}
-  \begin{itemize}
-  \item In task~2 the 15 Claude pipelines produced 4 distinct outputs; all 5 Opus runs were identical.
-  \item Codex produced 4 others, none shared.
-  \item In task~1 the families split on interpolation versus forward-filling.
-  \end{itemize}
-  Within-family correlation means repeated sampling from one model is not an ensemble of analysts.
-\item \textbf{Named biases are avoided.} No under-specified pipeline in task~3 used the survivors-only directory. Several runs named the survivorship risk explicitly.
-\item \textbf{One number does the damage.} Every material divergence came from a minimum history length of 20 or 24 quarters, above the evaluator's own 16, typically justified as ``16 training quarters plus the 4 held out.''
-\end{enumerate}
-
-\begin{table}[t]
-\centering
-\caption{Effect of a minimum-history filter alone (no other change): relative E1 shift. Values match Proposition~\ref{prop:minlen} to within \val{prop4-maxerr}.}\label{tab:minlen}
-\gentable{tab_minlen}
-\end{table}
-
-\paragraph{Ablation.} A factorial over the three conventions the LLMs chose (gap interpolation, keep-latest-segment, minimum length) reproduces the LLM shift at \val{abl-replication} times. Interpolation and the segment rule contribute at most \val{seg-interp-max}; we had predicted the segment rule would dominate. The minimum length alone drives the effect (Figure~\ref{fig:minlen}):
-\begin{itemize}
-\item it is exactly zero at the evaluator's own threshold;
-\item it grows monotonically with $L$ (Table~\ref{tab:minlen}): \val{minlen-l24-bank-range} at $L=24$ on banks, and \val{minlen-l24-eia} to \val{minlen-l48-eia} on plants.
-\end{itemize}
-Proposition~\ref{prop:minlen} gives the effect as (share of weight with history between $L_0$ and $L$) $\times$ (outcome gap between long and short histories). Both factors come from the reference run, so the harm of any proposed threshold can be tabulated before it is applied.
-
-\begin{figure}[t]
-\centering
-\IfFileExists{generated/fig_minlen.dat}{%
-\begin{tikzpicture}
-\begin{axis}[width=0.62\linewidth,height=6.2cm,xlabel={Minimum history length $L$ (quarters)},ylabel={Relative E1 shift (\%)},
-  xmin=16,xmax=48,ymin=0,ymax=90,legend style={font=\footnotesize,at={(1.03,1)},anchor=north west}]
-\addplot[mark=none,thick,blue] table[x=L,y=bank_leverage]{generated/fig_minlen.dat}; \addlegendentry{Bank leverage}
-\addplot[mark=none,thick,orange] table[x=L,y=bank_cash_liquidity]{generated/fig_minlen.dat}; \addlegendentry{Bank cash}
-\addplot[mark=none,thick,teal] table[x=L,y=bhc_leverage]{generated/fig_minlen.dat}; \addlegendentry{BHC leverage}
-\addplot[mark=none,thick,violet] table[x=L,y=bhc_cash_liquidity]{generated/fig_minlen.dat}; \addlegendentry{BHC cash}
-\addplot[mark=none,very thick,red] table[x=L,y=eia_plants]{generated/fig_minlen.dat}; \addlegendentry{Power plants}
-\draw[dashed,gray] (axis cs:20,0) -- (axis cs:20,88) node[pos=0.97,anchor=south east,rotate=90,font=\scriptsize]{LLM $L{=}20$};
-\draw[dashed,gray] (axis cs:24,0) -- (axis cs:24,88) node[pos=0.97,anchor=south east,rotate=90,font=\scriptsize]{LLM $L{=}24$};
-\end{axis}
-\end{tikzpicture}}{\fbox{\textcolor{red}{[fig\_minlen.dat not generated]}}}
-\caption{One unstated number does the damage. Effect of a minimum-history filter alone, relative to the reference (evaluator minimum $L_0=16$). Dashed lines mark the thresholds chosen by the LLM pipelines whose divergences were material. Curves match Proposition~\ref{prop:minlen} to within \val{prop4-maxerr}.}\label{fig:minlen}
-\end{figure}
-
-% ===========================================================================
-\section{Discussion and limitations}\label{sec:discussion}
-% ===========================================================================
-\paragraph{What to report.} We recommend that benchmark and pipeline authors publish two things:
-\begin{itemize}
-\item a ledger table of retention by entry cohort, age and exit relative to a reference;
-\item for each composition change, the decomposition terms and the bound of Proposition~\ref{prop:bound}.
-\end{itemize}
-Both cost one pass over keys plus the reference run.
-
-\paragraph{Scope.}
-\begin{itemize}
-\item \textbf{Alterations are out of scope} (Proposition~\ref{prop:identity}). They flip rankings that selection does not.
-\item \textbf{The reference pipeline is a choice.} The audit measures differences, not absolute correctness.
-\item \textbf{Cells are domain choices.} When the bug selects on a coordinate the cells do not capture, $T_2$ is large (Proposition~\ref{prop:within}). Recutting the cells is then the right move, as technology cells were for plants.
-\end{itemize}
-
-\paragraph{Evidence limits.}
-\begin{itemize}
-\item Two domains, three estimand families, and one forecasting horizon.
-\item In the LLM study the charter and state attributes are synthetic and independent of outcomes by construction. Model versions and reasoning effort were defaults.
-\item The plant mechanism is identified only in part.
-\item The monotonicity premise of Proposition~\ref{prop:minlen} holds only approximately in the data, although the measured dose-response is monotone on every panel.
-\end{itemize}
-
-% ===========================================================================
-\section{Conclusion}\label{sec:conclusion}
-% ===========================================================================
-Silent preprocessing changes in panels are mostly about \emph{who} is evaluated. Whether that changes \emph{what} is concluded depends on outcome heterogeneity along the coordinate the change selects on, which is a property of the panel. An entity-period ledger finds these changes. An exact decomposition prices them from the reference run alone. Four short propositions say when they are harmless. For LLM-written pipelines the remedy is mundane but effective: state the conventions, in particular every threshold on history length.
-
-\begin{thebibliography}{99}
-\bibitem{bejarano2026} Jeremy Bejarano, Viren Desai, Kausthub Keshava, Arsh Kumar, Zixiao Wang, Vincent Hanyang Xu, and Yangge Xu. An open benchmark for evaluating time series forecasting methods across financial markets. Working Paper 26-05, Office of Financial Research, 2026.
-\bibitem{blinder1973} Alan S. Blinder. Wage discrimination: reduced form and structural estimates. \emph{Journal of Human Resources}, 8(4):436--455, 1973.
-\bibitem{breck2019} Eric Breck, Neoklis Polyzotis, Sudip Roy, Steven Euijong Whang, and Martin Zinkevich. Data validation for machine learning. In \emph{Proceedings of SysML}, 2019.
-\bibitem{drechsler2017} Itamar Drechsler, Alexi Savov, and Philipp Schnabl. The deposits channel of monetary policy. \emph{The Quarterly Journal of Economics}, 132(4):1819--1876, 2017.
-\bibitem{elton1996} Edwin J. Elton, Martin J. Gruber, and Christopher R. Blake. Survivor bias and mutual fund performance. \emph{The Review of Financial Studies}, 9(4):1097--1120, 1996.
-\bibitem{godahewa2021} Rakshitha Godahewa, Christoph Bergmeir, Geoffrey I. Webb, Rob J. Hyndman, and Pablo Montero-Manso. Monash time series forecasting archive. In \emph{NeurIPS Datasets and Benchmarks Track}, 2021.
-\bibitem{heckman1979} James J. Heckman. Sample selection bias as a specification error. \emph{Econometrica}, 47(1):153--161, 1979.
-\bibitem{hewamalage2023} Hansika Hewamalage, Klaus Ackermann, and Christoph Bergmeir. Forecast evaluation for data scientists: common pitfalls and best practices. \emph{Data Mining and Knowledge Discovery}, 37:788--832, 2023.
-\bibitem{hyndman2006} Rob J. Hyndman and Anne B. Koehler. Another look at measures of forecast accuracy. \emph{International Journal of Forecasting}, 22(4):679--688, 2006.
-\bibitem{kapoor2023} Sayash Kapoor and Arvind Narayanan. Leakage and the reproducibility crisis in machine-learning-based science. \emph{Patterns}, 4(9):100804, 2023.
-\bibitem{kitagawa1955} Evelyn M. Kitagawa. Components of a difference between two rates. \emph{Journal of the American Statistical Association}, 50(272):1168--1194, 1955.
-\bibitem{makridakis2020} Spyros Makridakis, Evangelos Spiliotis, and Vassilios Assimakopoulos. The M4 Competition: 100,000 time series and 61 forecasting methods. \emph{International Journal of Forecasting}, 36(1):54--74, 2020.
-\bibitem{moretti2026} Valentina Moretti, Ivan Marisca, Cesare Alippi, and Andrea Cini. Position: Current benchmarking hinders real progress in deep learning for time series forecasting. In \emph{Proceedings of ICML}, 2026. arXiv:2512.22702.
-\bibitem{oaxaca1973} Ronald Oaxaca. Male--female wage differentials in urban labor markets. \emph{International Economic Review}, 14(3):693--709, 1973.
-\bibitem{preproc2026} Guilherme Afonso Galindo Padilha et al. Are we really benchmarking forecasting models? The impact of preprocessing on time series performance. arXiv:2610.09096, 2026.
-\bibitem{schelter2018} Sebastian Schelter, Dustin Lange, Philipp Schmidt, Meltem Celikel, Felix Biessmann, and Andreas Grafberger. Automating large-scale data quality verification. \emph{Proceedings of the VLDB Endowment}, 11(12):1781--1794, 2018.
-\bibitem{tashman2000} Leonard J. Tashman. Out-of-sample tests of forecasting accuracy: an analysis and review. \emph{International Journal of Forecasting}, 16(4):437--450, 2000.
-\end{thebibliography}
-
-\appendix
-% ===========================================================================
-\section{Proofs}\label{app:proofs}
-% ===========================================================================
-Notation is as in Section~\ref{sec:decomp}. All cell quantities use reference values $(a^r,w^r)$, and $w(A)=\sum_{i\in A}w^r_i$. When $W_{kc}=0$ we set $\mu_{kc}=\mu_{rc}$.
-
-\paragraph{Proposition~\ref{prop:identity}.}
-\begin{itemize}
-\item Weighted means aggregate over partitions, so $\theta_r=\sum_cW_{rc}\mu_{rc}$ and $\theta_{\mathrm{sel}}=\sum_cW_{kc}\mu_{kc}$.
-\item Adding and subtracting $\sum_cW_{kc}\mu_{rc}$ gives $\theta_{\mathrm{sel}}-\theta_r=T_1+T_2$. Adding $T_3$ gives the identity.
-\item Under the stated hypothesis $K=S_p$, and the candidate's per-entity values on $K$ equal the reference's, so $\theta_p=\theta_{\mathrm{sel}}$.
-\item A ranking by mean loss is a function of the pairwise gaps. Each gap is an E1-type estimand and is forecast exactly, so the ranking is too.
-\end{itemize}
-\hfill$\square$
-
-\paragraph{Proposition~\ref{prop:bound}.}
-\begin{itemize}
-\item Because $\sum_cW_{kc}=\sum_cW_{rc}=1$, the positive parts of $W_{kc}-W_{rc}$ sum to TV, and so do the negative parts.
-\item Hence $T_1\le\mathrm{TV}\max_c\mu_{rc}-\mathrm{TV}\min_c\mu_{rc}$, and symmetrically from below. Equality holds when all excess mass sits on an arg-max cell and all deficit on an arg-min cell.
-\item For the second bound write $T_1=\sum_cW_{rc}(W_{kc}/W_{rc}-1)(\mu_{rc}-\bar\mu_r)$, using $\sum_cW_{rc}(W_{kc}/W_{rc}-1)=0$, and apply Cauchy--Schwarz in $L^2(W_r)$.
-\item If $\mu_{rc}=m$ on every cell with $W_{kc}\ne W_{rc}$, write $T_1=\sum_c(W_{kc}-W_{rc})(\mu_{rc}-m)=0$.
-\end{itemize}
-\hfill$\square$
-
-\paragraph{Proposition~\ref{prop:within}.}
-\begin{itemize}
-\item Let $k_i=\mathbf 1\{i\in K\}$. Then $\mu_{kc}=\mathbb E_c[ak]/\mathbb E_c[k]$ with $\mathbb E_c[k]=\pi_c$, so $\mu_{kc}-\mu_{rc}=\mathrm{Cov}_c(a,k)/\pi_c$.
-\item Since $k$ is Bernoulli$(\pi_c)$ within the cell, $|\mathrm{Cov}_c(a,k)|\le\sigma_{rc}\sqrt{\pi_c(1-\pi_c)}$. Summing with weights $W_{kc}$ gives the bound.
-\item If $k$ is constant on each cell, the covariance is zero.
-\end{itemize}
-\hfill$\square$
-
-\paragraph{Proposition~\ref{prop:minlen}.}
-\begin{itemize}
-\item For $L\le L_0$ the filters are nested, so the candidate keeps $S_r$.
-\item For $L>L_0$, $\theta_r=\pi_L\mu_{\ge L}+(1-\pi_L)\mu_{<L}$ and $\theta(L)=\mu_{\ge L}$, which gives the formula.
-\item Let $m(n)=\mathbb E[a\mid n]$ be nondecreasing. Then
+\begin{appendix}
+\section{Bounds for the selection terms}\label{app:bounds}
+Using the reference distribution within each cell, let \(k_i\) denote retention, \(\pi_c=E_c[k]\) its weighted mean and \(\sigma_c\) the weighted standard deviation of \(a_i\). For a nonempty retained cell,
 \[
-\theta(L+1)-\theta(L)=\frac{P(n=L)}{P(n\ge L+1)}\big(\theta(L)-m(L)\big)\ge0,
+\mu_{kc}-\mu_{rc}=\operatorname{Cov}_c(a,k)/\pi_c.
 \]
-because $\theta(L)$ averages $m(n)$ over $n\ge L$. The nonincreasing case is symmetric.
-\end{itemize}
-\hfill$\square$
+Cauchy--Schwarz and \(\operatorname{Var}_c(k)=\pi_c(1-\pi_c)\) imply
+\[
+ |T_2|\le \sum_{c:\pi_c>0}W_{kc}\sigma_c\sqrt{(1-\pi_c)/\pi_c}.
+\]
+If each cell is fully retained or removed, then \(T_2=0\). Write \(\sigma_B^2=\sum_c W_{rc}(\mu_{rc}-\theta_r)^2\) for the between-cell variance. Subtract \(\theta_r\) from each mean in \(T_1\), since the changes in weights sum to zero. Cauchy--Schwarz then gives
+\[
+ |T_1|\le \sigma_B\left\{\sum_{c:W_{rc}>0}W_{rc}(W_{kc}/W_{rc}-1)^2\right\}^{1/2}.
+\]
+The bounds need no assumptions about why an entity was retained. They apply to reference-weight cells and can be loose when changes in cell contributions offset each other.
 
-% ===========================================================================
-\section{Pipeline catalogue}\label{app:bugs}
-% ===========================================================================
-Design (B) and held-out (x) pipelines. Each starts from the reference pipeline (calendar quarter-end grid, at most 20\% missing quarters, missing quarters dropped) and changes one step. Code: \texttt{pilot/ledger\_frozen\_v0.py} and \texttt{pilot/heldout\_v0.py}.
-
-\begin{center}
-\gentable{tab_catalogue}
-\end{center}
-
-\paragraph{LLM-written pipelines.} The \val{llm-total-pipes} pipelines, their specs and their prompts are in \texttt{llm\_bugs/}. Each was produced in an isolated folder containing only the spec and a synthetic sample:
-\begin{itemize}
-\item Claude models through agent sub-sessions pinned to Haiku, Sonnet or Opus;
-\item OpenAI \texttt{gpt-6.2-sol} through \texttt{codex exec}.
-\end{itemize}
-The minimum-length ablation adds 16 factorial configurations (\texttt{llm\_bugs/ablation.py}) and an exploratory sweep over $L$.
-
-% ===========================================================================
-\section{Pre-registration log}\label{app:prereg}
-% ===========================================================================
-The full log is \texttt{FREEZE\_LEDGER.txt}: hashes, timestamps, predictions, outcomes and deviations D1--D5. Of \val{prereg-total} predictions, \val{prereg-pass} passed, \val{prereg-fail} failed and \val{prereg-vacuous} were vacuous, because their premise never occurred (for example, no pipeline fell for the survivorship trap).
-
-{\small\setlength{\tabcolsep}{4pt}\IfFileExists{generated/tab_prereg.tex}{\input{generated/tab_prereg.tex}}{\textcolor{red}{[tab\_prereg not generated]}}}
-
-
+\section{Pipeline catalogue}\label{app:catalogue}
+The B variants were used in the design of the audit. The x variants were authored after the first ledger was frozen and draw on known pitfalls. The differential ledger was developed subsequently. These are controlled implementations. In x8, ``benign'' describes its effect on the scale-invariant forecast gap in this design.
+\begin{center}\datatable{tab_catalogue}\end{center}
+\end{appendix}
+\bibliographystyle{jds2}
+\bibliography{references}
 \end{document}
