@@ -1,0 +1,18 @@
+eia_plants G0_S0_L0 ok key_dev=0.0000
+eia_plants G0_S0_L16 ok key_dev=0.0402
+eia_plants G0_S0_L20 ok key_dev=0.0628
+eia_plants G0_S0_L24 ok key_dev=0.0869
+eia_plants G0_S1_L0 ok key_dev=0.0218
+eia_plants G0_S1_L16 ok key_dev=0.0634
+eia_plants G0_S1_L20 ok key_dev=0.0863
+eia_plants G0_S1_L24 ok key_dev=0.1109
+eia_plants G1_S0_L0 ok key_dev=0.0002
+eia_plants G1_S0_L16 ok key_dev=0.0403
+eia_plants G1_S0_L20 ok key_dev=0.0629
+eia_plants G1_S0_L24 ok key_dev=0.0870
+eia_plants G1_S1_L0 ok key_dev=0.0199
+eia_plants G1_S1_L16 ok key_dev=0.0613
+eia_plants G1_S1_L20 ok key_dev=0.0841
+eia_plants G1_S1_L24 ok key_dev=0.1086
+
+--- stderr ---

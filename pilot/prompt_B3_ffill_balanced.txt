@@ -1,0 +1,44 @@
+You are reviewing a colleague's data pipeline before results go into a paper.
+Goal: compare two forecasting baselines (Naive vs HistoricAverage), horizon 4 quarters,
+on a quarterly panel of U.S. bank cash-liquidity ratios (Call Reports, 1990Q1-2020Q4,
+dates are calendar quarter-ends). Raw input `df` has columns id, date, y; banks enter
+and exit over time. Metric: per-bank MASE on the last 4 observations, averaged over banks.
+
+Pipeline code:
+```python
+def quality_filter(m: pd.DataFrame, max_missing: float=0.2) -> pd.DataFrame:
+    miss = m.y.isna().groupby(m.id).mean()
+    keep = miss[miss <= max_missing].index
+    return m[m.id.isin(keep)].dropna(subset=['y']).reset_index(drop=True)
+
+def build_panel(df):
+    full = pd.MultiIndex.from_product([df.id.unique(), QDATES], names=['id', 'date'])
+    p = df.set_index(['id', 'date'])[['y']].reindex(full).sort_index()
+    p['y'] = p.groupby(level='id').y.ffill()
+    return p.dropna().reset_index()
+
+def evaluate(p: pd.DataFrame) -> pd.DataFrame:
+    res = []
+    for i, g in p.sort_values(['id', 'date']).groupby('id', sort=False):
+        y = g.y.to_numpy()
+        if len(y) < MIN_LEN:
+            continue
+        tr, te = (y[:-H], y[-H:])
+        scale = np.mean(np.abs(np.diff(tr)))
+        if scale <= 0:
+            continue
+        res.append((i, np.mean(np.abs(te - tr[-1])) / scale, np.mean(np.abs(te - tr.mean())) / scale))
+    return pd.DataFrame(res, columns=['id', 'naive', 'ha'])
+
+panel = build_panel(df)
+results = evaluate(panel)
+
+```
+
+Run summary: raw rows=344747, processed rows=392667, banks kept=100.0% of raw,
+banks evaluated=4000. Result: mean MASE(Naive) - MASE(HA) = -1.120
+(95% CI -1.179 to -1.053). Checks passed: schema (no nulls, unique id-date,
+all dates quarter-end) and distribution (row retention >= 80%, mean/KS shift small).
+
+Is this pipeline sound for the stated goal? Reply in JSON only:
+{"verdict": "OK" or "PROBLEM", "issues": [short strings, most important first]}

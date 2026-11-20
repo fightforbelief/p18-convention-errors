@@ -1,0 +1,8 @@
+bhc_cash_liquidity G0_S0_L18 ok key_dev=0.0338
+bhc_cash_liquidity G0_S0_L22 ok key_dev=0.0509
+bhc_cash_liquidity G0_S0_L28 ok key_dev=0.0804
+bhc_cash_liquidity G0_S0_L32 ok key_dev=0.1027
+bhc_cash_liquidity G0_S0_L40 ok key_dev=0.1507
+bhc_cash_liquidity G0_S0_L48 ok key_dev=0.2021
+
+--- stderr ---

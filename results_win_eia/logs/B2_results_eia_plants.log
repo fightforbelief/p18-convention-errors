@@ -1,0 +1,22 @@
+eia_plants codex_1 ok key_dev=0.0541
+eia_plants codex_2 ok key_dev=0.0467
+eia_plants codex_3 ok key_dev=0.0435
+eia_plants codex_4 ok key_dev=0.0435
+eia_plants codex_5 ok key_dev=0.0510
+eia_plants haiku_1 ok key_dev=0.0350
+eia_plants haiku_2 ok key_dev=0.0350
+eia_plants haiku_3 ok key_dev=0.0225
+eia_plants haiku_4 ok key_dev=0.0381
+eia_plants haiku_5 ok key_dev=0.0381
+eia_plants opus_1 ok key_dev=0.0197
+eia_plants opus_2 ok key_dev=0.0197
+eia_plants opus_3 ok key_dev=0.0197
+eia_plants opus_4 ok key_dev=0.0197
+eia_plants opus_5 ok key_dev=0.0197
+eia_plants sonnet_1 ok key_dev=0.0225
+eia_plants sonnet_2 ok key_dev=0.0225
+eia_plants sonnet_3 ok key_dev=0.0197
+eia_plants sonnet_4 ok key_dev=0.0225
+eia_plants sonnet_5 ok key_dev=0.0225
+
+--- stderr ---

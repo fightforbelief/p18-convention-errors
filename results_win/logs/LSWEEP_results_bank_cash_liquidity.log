@@ -1,0 +1,8 @@
+bank_cash_liquidity G0_S0_L18 ok key_dev=0.0135
+bank_cash_liquidity G0_S0_L22 ok key_dev=0.0205
+bank_cash_liquidity G0_S0_L28 ok key_dev=0.0358
+bank_cash_liquidity G0_S0_L32 ok key_dev=0.0485
+bank_cash_liquidity G0_S0_L40 ok key_dev=0.0865
+bank_cash_liquidity G0_S0_L48 ok key_dev=0.1247
+
+--- stderr ---

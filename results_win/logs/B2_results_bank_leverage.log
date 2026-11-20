@@ -1,0 +1,22 @@
+bank_leverage codex_1 ok key_dev=0.0241
+bank_leverage codex_2 ok key_dev=0.0146
+bank_leverage codex_3 ok key_dev=0.0126
+bank_leverage codex_4 ok key_dev=0.0126
+bank_leverage codex_5 ok key_dev=0.0221
+bank_leverage haiku_1 ok key_dev=0.0088
+bank_leverage haiku_2 ok key_dev=0.0088
+bank_leverage haiku_3 ok key_dev=0.0066
+bank_leverage haiku_4 ok key_dev=0.0108
+bank_leverage haiku_5 ok key_dev=0.0108
+bank_leverage opus_1 ok key_dev=0.0046
+bank_leverage opus_2 ok key_dev=0.0046
+bank_leverage opus_3 ok key_dev=0.0046
+bank_leverage opus_4 ok key_dev=0.0046
+bank_leverage opus_5 ok key_dev=0.0046
+bank_leverage sonnet_1 ok key_dev=0.0066
+bank_leverage sonnet_2 ok key_dev=0.0066
+bank_leverage sonnet_3 ok key_dev=0.0046
+bank_leverage sonnet_4 ok key_dev=0.0066
+bank_leverage sonnet_5 ok key_dev=0.0066
+
+--- stderr ---

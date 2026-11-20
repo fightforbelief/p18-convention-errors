@@ -1,0 +1,18 @@
+bhc_leverage G0_S0_L0 ok key_dev=0.0000
+bhc_leverage G0_S0_L16 ok key_dev=0.0261
+bhc_leverage G0_S0_L20 ok key_dev=0.0422
+bhc_leverage G0_S0_L24 ok key_dev=0.0604
+bhc_leverage G0_S1_L0 ok key_dev=0.0131
+bhc_leverage G0_S1_L16 ok key_dev=0.0398
+bhc_leverage G0_S1_L20 ok key_dev=0.0561
+bhc_leverage G0_S1_L24 ok key_dev=0.0743
+bhc_leverage G1_S0_L0 ok key_dev=0.0003
+bhc_leverage G1_S0_L16 ok key_dev=0.0263
+bhc_leverage G1_S0_L20 ok key_dev=0.0423
+bhc_leverage G1_S0_L24 ok key_dev=0.0605
+bhc_leverage G1_S1_L0 ok key_dev=0.0086
+bhc_leverage G1_S1_L16 ok key_dev=0.0349
+bhc_leverage G1_S1_L20 ok key_dev=0.0511
+bhc_leverage G1_S1_L24 ok key_dev=0.0694
+
+--- stderr ---

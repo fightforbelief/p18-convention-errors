@@ -1,0 +1,10 @@
+bhc_cash_liquidity codex_1 ok key_dev=0.0000
+bhc_cash_liquidity codex_2 ok key_dev=0.0000
+bhc_cash_liquidity haiku_1 ok key_dev=0.0000
+bhc_cash_liquidity haiku_2 ok key_dev=0.0000
+bhc_cash_liquidity opus_1 ok key_dev=0.0000
+bhc_cash_liquidity opus_2 ok key_dev=0.0000
+bhc_cash_liquidity sonnet_1 ok key_dev=0.0000
+bhc_cash_liquidity sonnet_2 ok key_dev=0.0000
+
+--- stderr ---

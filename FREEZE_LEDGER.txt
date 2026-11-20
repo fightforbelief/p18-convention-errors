@@ -1,0 +1,247 @@
+39b156e65fe1c690eee8fe0ad92b912f1b9d1fb6d9bc6b1fd663c5d2264f1d0f  pilot/ledger_frozen_v0.py
+frozen 2026-11-19T02:49Z before any held-out bug was written; tol=0.10, coords=entry(cohort x quarter), exit, age(years, capped 5), plus provenance
+
+--- v1 ---
+ba7ac1a690ef1752c0acb7c617d5c01a0944cc324713159080f3bb5af454ac0d  pilot/ledger_v1.py
+frozen 2026-11-19T03:03Z, after v0 failed on bank_leverage (4000-bank subsample), BEFORE any run on bhc_leverage.
+Reference pipeline = make_grid + quality_filter (C0). TOL=0.10, FLOOR=0.5.
+Pre-registered predictions for bhc_leverage (flag = ledger v1 fires):
+  flag:    B1 grid step, B2 survivor join, B3 ffill (R1), B4 warm-up dropna, x1 90D step (R2), x2 rollforward (R1), x3 active-at-end, x4 long-history
+  no flag: B5 scale leak, x5 shift(-1) dropna, x6 stale link values, x7 winsorize, x8 z-score, x9 reshuffle
+Success criterion: >= 7/8 predicted flags fire AND <= 1/6 predicted no-flags fire.
+
+--- decomposition (pilot/decomp.py) ---
+50a7b6d5cd0997bd3bda64b2e0d8342fe0bc76e2fb573b1a28f9b568a04c7b8f  pilot/decomp.py
+frozen 2026-11-19T03:18Z. Dev data: synthetic:0 and bank_leverage only. Test data: bhc_cash_liquidity, bank_cash_liquidity (bank-level cash/assets built from the P12 Call Report extract, FTSFR-style). Both are unseen by this code.
+Predictions (harm_ratio = |shift| / reference 95% half-width):
+  D1  On both cash panels, the P12 grid bug B1 is harmful (harm_ratio > 1) and > 85% of its shift is T1+T2 (selection).
+      Dev comparison: bank_leverage B1 harm_ratio ~0.6.
+  D2  On both cash panels, |T3| / |total| < 0.05 for B2 and x3 (pure selection), and |T3| / |total| > 0.8 for B3 and B5 (alteration).
+  D3  On each cash panel, the B1 harm_ratio exceeds bank_leverage's.
+Outcome (graded 2026-11-19 after the test run, results in pilot/decomp_test_results.csv):
+  D1 FAILED: B1 harm_ratio was 0.51 (bhc_cash) and 0.04 (bank_cash). The selection share of 100% held, but the bug was not harmful.
+  D2 PASSED: T3 share was 0.00 for B2 and x3, and >= 1.00 for B3 and B5, on both cash panels.
+  D3 FAILED: 0.51 and 0.04 vs bank_leverage's 0.57.
+
+--- decomposition v2 + estimands (pilot/estimands.py) ---
+78d75daa5218cc4c86a6a78cf78bcc78f0f71bfbc129cdecb6eb5acd58e669c2  pilot/estimands.py
+frozen 2026-11-19T06:53Z, after a synthetic-only smoke test (800 banks), BEFORE any run on full panels or any real-data run of E2/E3.
+Data: all four FULL panels (bank_leverage 22,965 banks; bank_cash 23,862; bhc_leverage 13,761; bhc_cash 13,770).
+Estimands: E1 mean MASE(Naive)-MASE(HA); E2 FE-AR(1) persistence rho (Sxx-weighted); E3 6-model MASE ranking.
+Material: E1 |shift| >= 10% |theta_r|; E2 |shift| >= 10% (1-rho_r); E3 top-1 model changes.  Harm = CI-based (n-dependent).
+Selection bugs = B1, B2, x3, x4.  Alteration bugs = B3, B4, x5, x7.
+Predictions:
+  P1 (exactness) For every selection bug on all 4 panels: |T3| < 1e-9 for E1 and E2, and the no-refit forecast ranking equals the actual ranking (E3).
+  P2 (harm is n-dependent) On full bank_leverage, B1 E1 harm_ratio > 1 while rel_shift < 0.10 (harmful, not material).
+     B1 E1 is not material on >= 3/4 panels.
+  P3 (bias errors are robust) B2 and x3 are E1-material on all 4 panels.
+  P4 (class depends on the estimand) x4 is E2-material on >= 3/4 panels (dropping short series raises FE rho via the
+     Nickell channel), and E2 total > 0 for x4, B2 and x3 on >= 3/4 panels each.
+  P5 (ranking) B1 never changes the top-1 model (0/4 panels).  B3 flips >= 1 significant pair on >= 3/4 panels.
+  P6 (no-refit forecast) For alteration bugs, in >= 75% of their E1/E2 cells with harm_ratio > 1, |total - forecast| > 0.5 |total|.
+Outcome (graded 2026-11-19 by pilot/grade_v2.py on pilot/estimands_*_full.csv):
+  Deviation D2 (found after the run, before writing up): E2 is degenerate on both LEVERAGE panels. One entity holds 68% (bhc) / 30% (bank)
+    of the Sxx weight; leverage reaches 14,699 / 36,527. Pooled rho is 0.12 / 0.20 vs a per-bank median of 0.87 / 0.90.
+    E2 is graded on the two CASH panels only (top-10 weight share 4.5%). Leverage E2 rows are reported as non-interpretable.
+  P1 PASSED: T3 = 0 for B1, B2, x3, x4 on E1 and E2 on all 4 panels; the no-refit ranking forecast was exact in 16/16 cells.
+  P2 FAILED (narrowly): B1 E1 harm_ratio on full bank_leverage was 0.90, not > 1. The shift shrank from -0.079 (4k subsample) to -0.050.
+     The second part held: B1 E1 was not material on 4/4 panels (rel_shift 0.8-2.6%).
+  P3 PASSED: B2 and x3 E1 rel_shift 15.9-23.8% on all 4 panels.
+  P4 FAILED: x4 E2 rel_shift on the cash panels was 9.0% and 9.7% (threshold 10%). Material on 2/4 only if the degenerate leverage rows are counted.
+     The sign part held: E2 total > 0 for x4, B2 and x3 on 4/4 panels.
+  P5 PASSED: B1 changed no top-1 model and flipped no significant pair. B3 flipped >= 1 significant pair on 4/4 panels.
+  P6 PASSED.
+
+--- LLM-written bug set (llm_bugs/) ---
+856a55e3da219242fb3d490c544d445cdf0b71846771a1cb67112b65a2fc8a7a  llm_bugs/spec.md
+9d58e36aa29d3368ea873d8a21180f0d446a93ec420f9c09f2b980c0df22a721  llm_bugs/reference.py
+8eb84a7ffd1c5bd963c82d648707c4e66b263f5e30cbd763f30fbdca760ac482  llm_bugs/make_inputs.py
+c0e70bc76f21d0dd4c2207f575c65b69de709a4adbc045fcb33bce4591903ccf  llm_bugs/harness.py
+9378420dee4ec8817439ba5ad71ea7517c5ffe07c9c37b1ef1bfe31e6ee6d696  llm_bugs/run_one.py
+frozen 2026-11-19T07:08Z. 15 pipelines (haiku, sonnet, opus x 5 runs, identical prompt, isolated folders, spec + synthetic sample only).
+Disclosure: two sonnet hand-back summaries arrived before this freeze (each said only that the sample run gave 16,632 rows / 213 banks). No pipeline code had been read and nothing had run on real data.
+Charter is synthetic and assigned from the bank id only, so it is independent of y by construction.
+Definitions (per pipeline x panel cell): deviating = status ok AND (key_dev >= 0.001 OR value_mismatch > 0). Silent = deviating AND schema_ok.
+Predictions:
+  Q1 >= 4/15 pipelines are silently deviating on at least one panel.
+  Q2 Ledger v1 flags >= 60% of cells with key_dev >= 0.01, and 0% of cells with key_dev == 0 and value_mismatch == 0.
+  Q3 The baseline stats check (vs raw) gives the same verdict on deviating cells as on the reference in >= 80% of them (it cannot discriminate).
+  Q4 Most deviating pipelines (> 50%) trace to the charter rules (rules 2-3: as-of join, ordering) rather than the grid (rule 1). Root cause assigned by code review after the run.
+  Q5 Every E1-material deviation selects on exit status or history length, not on charter alone. At most 1/3 of deviating pipelines are E1-material on any panel.
+  Q6 haiku has more deviating pipelines than opus.
+  Q7 For deviating cells with value_mismatch == 0 and dup_keys == 0, E1 and E2 |T3| < 1e-9 (the no-refit forecast is exact).
+  Deviation D3 (07:09Z, before any real-data run): harness.py import fix only (chdir to pilot/ for the relative-path hash checks). New hash: f20860dcf7a404f1
+Outcome arm A (explicit spec), graded 2026-11-19T07:12Z: 15/15 pipelines reproduce the reference EXACTLY on all 4 full panels (60/60 cells: same keys, same values).
+  Q1 FAILED (0/15 deviating). Q2 no-false-flag part PASSED (ledger 0/60); sensitivity part vacuous. Q3-Q7 vacuous (no deviations).
+  Q6 FAILED (haiku 0 = opus 0). Interpretation: with every convention stated, current LLMs make no convention errors on this task.
+
+--- arm B: under-specified spec (llm_bugs/spec_B.md), same harness, inputs, models and prompt ---
+eb612b910fb5df80f766947bd27ae1f332172455c5f9ff939d6aad9a8c6d9295  llm_bugs/spec_B.md
+frozen 2026-11-19T07:12Z, before any arm-B pipeline was written. The ground truth is still the arm-A reference (the intended panel).
+Divergences are convention choices, so they need not be "wrong". The question is which ones move conclusions.
+Predictions:
+  QB1 >= 8/15 pipelines diverge from the reference (key_dev >= 0.001 or value_mismatch > 0) on >= 1 panel.
+  QB2 >= 3/15 impute or forward-fill (value alteration, invisible to the ledger by design).
+  QB3 >= 3/15 decide charter from a single snapshot per bank (latest or first) instead of as-of.
+  QB4 Ledger v1 flags >= 60% of cells with key_dev >= 0.01, and 0% of cells with key_dev == 0 and value_mismatch == 0.
+  QB5 >= 1 pipeline is E1-material on >= 2 panels.
+  QB6 Among composition-only divergences (value_mismatch == 0), E1 |T3| < 1e-9 (exact no-refit forecast).
+Outcome arm B (under-specified spec), graded 2026-11-19T07:24Z from llm_bugs/B_results_*.csv and a code review of llm_bugs/pipelines_B/:
+  QB1 PASSED: 15/15 diverge on all 4 panels (key_dev 0.6%-7.4%). All pass schema; the baseline stats check passes all 60 cells (and passes the reference too).
+  QB2 PASSED: 15/15 linearly interpolate interior gaps (max gap 2-4 quarters). This shows up as EXTRA keys, not as value_mismatch.
+  QB3 FAILED: 0/15. All 15 assign charter point-in-time (14 with merge_asof, haiku_1 with ffill over snapshots).
+  QB4 PASSED: the ledger flags 60/60 cells (R1 fires on interpolated keys). The no-false-flag part is vacuous because no arm-B cell matches the reference.
+  QB5 FAILED: E1-material in 2/60 cells only (sonnet_4 and sonnet_5, whose outputs are identical, on bhc_cash: 10.6%). No pipeline is material on >= 2 panels.
+     E2 is never material on the cash panels. E3 top-1 never changes.
+  QB6 FAILED as specified: value_mismatch == 0 everywhere, yet T3 != 0, because interpolated rows alter the series through added keys. The predicate was wrong, not the identity.
+  Exploratory (not pre-registered): E1 shift < 0 in 54/60 cells, i.e. the shared conventions systematically favour Naive. Median selection share of |shift| is 0.74.
+
+--- task 2 (year-over-year change panel) + second model family (OpenAI via the bundled codex CLI, ChatGPT login) ---
+f77456aee87b30419b500ce677d548f9b19608d75fd4bd5e618af94c73f98646  llm_bugs/spec_A2.md
+d8dae3f0717bb38df7c6e1b18cea099ebcf59e1fc46cb3d07c274f6f66d70403  llm_bugs/spec_B2.md
+ed656756d7d37cbac0ab367c55bc0ef385af39d46d0ba66062771fe017e1e8df  llm_bugs/reference_yoy.py
+1f2d3cc35698f4c38c2f35c30f5ce11faa18f84e58d5bae0cc9c1bdf44999dc5  llm_bugs/harness.py
+frozen 2026-11-19T07:36Z, before any task-2 or codex pipeline was written. harness.py change: reference module and output prefix are now arguments; no logic change.
+A self-check (reference_yoy run as a pipeline on bhc_cash) gave key_dev 0, no value mismatch and no ledger flag.
+Runs: A2 explicit = 4 families (haiku, sonnet, opus, codex) x 2. B2 under-specified = 4 families x 5. Task-1 arm B for codex = 5.
+Codex sees only the spec and the synthetic sample. Default codex model; the model name is recorded from the run log.
+Predictions:
+  T2A  >= 7/8 A2 pipelines match reference_yoy exactly on all 4 panels.
+  R1   >= 15/20 B2 pipelines diverge on >= 1 panel.
+  R2   >= 4/20 B2 pipelines lag by rows (shift(4)) instead of calendar quarters, so they mismatch values on existing keys (code review).
+  R3   >= 3/20 B2 pipelines use a percent change instead of a difference.
+  R4   >= 1 B2 pipeline is E1-material on >= 2 panels.
+  R5   Among diverging B2 cells, the E1 shift has the same sign in >= 75% (correlated conventions; task 1 gave 54/60).
+  R6   Ledger blind spot: among B2 cells with key_dev < 0.001 and value_mismatch > 0, the ledger flags <= 20%.
+  C1   >= 4/5 codex task-1 arm-B pipelines diverge, and >= 3/5 interpolate.
+  C2   Cross-family agreement: on >= 3/4 panels, the sign of the median codex E1 shift equals that of the Anthropic median, on task 1 arm B AND on B2.
+Outcome task 2 + codex, graded 2026-11-19T07:50Z (llm_bugs/A2_results_*, B2_results_*, Bcodex_results_*; codex model = gpt-6.2-sol, reasoning effort low):
+  T2A PASSED: 8/8 A2 pipelines (haiku, sonnet, opus, codex x 2) match reference_yoy exactly on all 4 panels.
+  R1  PASSED: 20/20 B2 pipelines diverge (key_dev 0.5-4.2%).
+  R2  FAILED: 0/20 lag by rows; all 20 match on calendar quarters.
+  R3  FAILED: 0/20 use a percent change (two opus runs explicitly reject it because the ratio can be near zero).
+  R4  FAILED: no B2 pipeline is E1-material on any panel (max 3.9%). E3 top-1 never changes.
+  R5  FAILED: among B2 cells with a non-zero shift, the same-sign share is 0.71 (< 0.75). Task 1 with all four families gives 0.775.
+  R6  vacuous: no B2 cell has key_dev < 0.001 with value_mismatch > 0.
+  C1  FAILED: codex task-1 arm B diverges 5/5, but interpolates in only 1/5. 4/5 forward-fill instead.
+  C2  FAILED: task 1, the codex median sign matches the Anthropic median on 2/4 panels (opposite on both BHC panels).
+      B2: the Anthropic median shift is exactly 0 on all panels, codex is negative.
+  Exploratory: ledger flags task-1 arm B 80/80 but B2 0/80.
+  Anthropic B2 collapses to 4 distinct outputs (opus 5/5 identical); codex gives 4 distinct outputs, none shared with Anthropic.
+  Many B2 extra keys are banks with 8-15 YoY quarters, which the evaluator's own MIN_LEN=16 drops, so E1 is unchanged (exact 0).
+
+--- task 3: bias-type trap (Midwest panel; the current directory covers survivors only) ---
+c3ec93dc9b61921a346a226206d6e3aa84612e13c37142432c73f8ab21a125d3  llm_bugs/spec_A3.md
+c330fab0308cd25251152e9d8db6af428860d0629e352cfb3468a8749cc2c037  llm_bugs/spec_B3.md
+653f1f946c004ac71bee134789ab5753136ef0fb0d08a88cf62ef5ddf4af365f  llm_bugs/reference_region.py
+9e41364527965b0d889c3fe671ea2c8be396f0885b33b3d4685ba141a88eb553  llm_bugs/make_inputs3.py
+3e69e3069ec8c22cd84147e405c510e0799a38c583bf6bb58e035209a50dead7  llm_bugs/harness.py
+01ab7b91d37d0a7c1b92860ab62bfae01ca5d51fedefc375225148bc0ef92d66  llm_bugs/run_one.py
+frozen 2026-11-19T08:15Z, before any task-3 pipeline was written.
+harness/run_one change: inputs are passed as keywords named after the parquet files (calls/attrs or calls/directory/history). No logic change.
+Self-check: reference_region run as a pipeline on bhc_cash gives key_dev 0, no ledger flag.
+State is synthetic and independent of y. The directory lists only banks alive at the last date (22-28% of banks on real panels).
+B3 describes it neutrally ("as published at the end of the sample period"); A3 says explicitly not to use it.
+Runs: A3 = 4 families x 2; B3 = 4 families x 5 (haiku, sonnet, opus via subagents; codex gpt-6.2-sol via CLI).
+"Survivorship pipeline" = its keyed output drops >= 50% of the reference's entity-periods from exited banks (a harness diagnostic), confirmed by code review.
+Predictions:
+  S1  >= 5/20 B3 pipelines are survivorship pipelines.
+  S2  Every survivorship pipeline is E1-material (rel >= 10%) on >= 3/4 panels.
+  S3  Ledger v1 flags every survivorship pipeline on every panel.
+  S4  >= 7/8 A3 pipelines match reference_region exactly on all 4 panels.
+  S5  The survivorship rate differs by family: at least one family has >= 2/5, and at least one has <= 1/5.
+  S6  For survivorship pipelines, the selection part (T1+T2) is >= 70% of |E1 total| (median over cells).
+Outcome task 3, graded 2026-11-19T08:26Z (llm_bugs/grade3.py -> B3_graded.csv, A3_results_*):
+  S1 FAILED: 0/20 B3 pipelines are survivorship pipelines. The largest exited-bank drop is 11.8%; all 20 take state point-in-time from history.
+     Several hand-backs (haiku, opus) name the survivorship/look-ahead risk of the directory explicitly.
+  S2, S3, S6 vacuous (no survivorship pipelines). S4 PASSED: 8/8 A3 exact. S5 FAILED (0 in every family).
+  Crash: codex_3 (B3) failed loudly on all 4 panels: fillna(np.inf) on a nullable Int64 end_date.
+     The sample CSV loads as float, the production parquet as Int64 (deviation D4: sample and production dtypes differ; a loud failure, not silent).
+  Exploratory: 76/76 cells flagged by the ledger. E1-material in 3/76 (opus_2, opus_3, sonnet_5 on bhc_cash: 10.0-10.4%).
+     All three come from the "most recent contiguous stretch + >= 24 quarters" convention (history-length selection), not from the planted trap.
+     Median selection share of |shift| 0.86; E1 < 0 in 78% of cells. Median E1 rel by family: codex 0.25%, haiku 1.4%, sonnet 2.4%, opus 2.9%.
+
+--- segment-rule ablation (llm_bugs/ablation.py, pipelines_abl/: G in {0,1} x S in {0,1} x L in {0,16,20,24}) ---
+6b3af35e9972c6249cec964edeb998eb507d9eed10ad7f5648a765a9cc437716  llm_bugs/ablation.py
+frozen 2026-11-19T08:27Z, after a sample-only smoke test (G0_S0_L0 == reference on the sample), before any real-panel run.
+Base = task-1 reference (reference.py), run through the same harness on the 4 full panels.
+Predictions:
+  AB0 G0_S0_L0 is identical to the reference (key_dev 0) on all 4 panels.
+  AB1 G alone (G1_S0_L0): E1 rel <= 1% on all panels.
+  AB2 L alone (G0_S0_L16/20/24): E1 rel <= 3% on all panels.
+  AB3 S with G (G1_S1_L0): E1 shift < 0 on >= 3/4 panels, and >= 60% of the G1_S1_L24 shift on each panel.
+  AB4 G1_S1_L24 reproduces the task-1 arm-B sonnet_4/5 E1 shift within +-30% (relative) on each panel.
+  AB5 For every S=1 config with E1 rel >= 2%, the selection part (T1+T2) is >= 70% of |total|.
+  AB6 The ledger flags every S=1 config on every panel, and no G0_S0 config with L <= 16.
+Outcome ablation, graded 2026-11-19T08:34Z (llm_bugs/grade_abl.py on ABL_results_*):
+  AB0 PASSED (G0_S0_L0 == reference on all 4 panels).  AB1 PASSED (interpolation alone <= 0.5%).
+  AB2 FAILED: the minimum length ALONE is the driver: G0_S0_L24 E1 rel 1.2-10.4% (bhc_cash 10.4%); L16 = 0 (the evaluator already requires 16).
+  AB3 FAILED: the segment rule is negligible. G1_S1_L0 shifts <= 0.5% with mixed sign; my mechanism hypothesis was wrong.
+  AB4 PASSED: G1_S1_L24 reproduces the LLM sonnet_4 shift at ratios 0.98-1.06 on all 4 panels (the ablation captures the mechanism).
+  AB5 PASSED (selection share >= 0.98 where rel >= 2%).
+  AB6 FAILED: G0_S1_L0 is NOT flagged (the segment rule is near-uniform), and G0_S0_L16 IS flagged on both BHC panels.
+  Exploratory (not pre-registered), L sweep 16-48 with G0_S0: a monotone dose-response. E1 rel at L = 20/24/32/48:
+     bank_cash 2.3/4.7/9.5/22%, bank_lev 0.6/1.2/2.4/6.9%, bhc_cash 5.3/10.4/18.7/35%, bhc_lev 3.6/6.7/11.8/24%. The E3 top-1 never changes.
+
+--- migration to hanqing-win + non-bank replication (EIA-923 power plants) ---
+2026-11-19T08:46Z. Per RULES.md, P18 now runs on hanqing-win from Research_Portfolio_2026\p18-convention-errors with its own .venv
+(Python 3.12.10; pandas 3.1.1, numpy 2.5.5, scipy 1.18.1, pyarrow 26.0.1; requirements.lock.txt). All earlier results were produced on a
+Mac scratchpad venv (Python 3.13.5, same package versions). They are re-run on Windows by scripts/run_all.py and compared.
+Bank panel inputs on Windows are byte-identical to the Mac copies (SHA-256 checked).
+Deviation D5: the frozen scripts derive panel tags with path.split("/"). The Windows runner passes forward-slash paths; no frozen file changed.
+EIA panel: 24 annual EIA-923 zips 2001-2024 (330.9 MB, data/raw/eia923/MANIFEST.csv), built by scripts/build_eia.py
+  (sha256 E5FE8156...) into data/raw/eia_plants_panel.parquet (sha256 5ED2DE01...): 686,908 plant-quarters, 15,131 plants, 2001Q1-2024Q4,
+  4,387 present at start, 12,517 alive at end. y = quarterly net generation (GWh). Only counts were inspected; no outcome statistics.
+Predictions for the EIA panel (frozen before any estimand, ledger or LLM pipeline is run on it):
+  N1 Ledger v1 on full EIA flags >= 7 of {B1,B2,B3,B4,x1,x2,x3,x4} and <= 1 of {B5,x5,x6,x7,x8,x9}.
+  N2 B1 (the P12 grid bug) is not E1-material; B2 and x3 (survivorship) are E1-material (>= 10%).
+  N3 For selection bugs (B1, B2, x3, x4): |T3| < 1e-9 on E1 and E2; the no-refit ranking forecast is exact.
+  N4 Min-length dose-response (G0_S0_L16..48): E1 shift is 0 at L16 and monotone in L with a constant sign; E1 rel at L48 >= 5%.
+  N5 Task-1 explicit-spec LLM pipelines (arm A, 15) are exact on EIA; under-specified (arm B, 20) all diverge; the ledger flags >= 90% of arm-B cells.
+  N6 Every E1-material LLM cell on EIA (any arm) comes from a pipeline whose minimum length exceeds 16 quarters.
+Outcome migration + EIA, graded 2026-11-19T13:36Z:
+  Reproduction: the hanqing-win re-run (results_win/, run_manifest_pilot_estimands_llm.json, 1636 s) matches every Mac result file.
+    Numeric max relative difference <= 2e-10; categorical columns identical (the only text "differences" were NaN vs NaN).
+    The Mac decomp_test file also held the two dev panels; restricted to the test panels it matches exactly.
+    The Windows B arm = Mac B + Bcodex (20 rows), exact.
+  EIA (results_win_eia/, 636 s):
+  N1 PASSED: ledger v1 8/8 flagged, 0/6 false.
+  N2 FAILED: B1 (grid bug) IS E1-material on EIA: rel 17.3%, harm 1.70, cohort TV 0.18, 100% selection (T1).
+     B2 47.7% and x3 42.0% are material as predicted. On banks B1 was 0.8-2.6%.
+  N3 PASSED: T3 = 0 for selection bugs on E1/E2; the no-refit ranking forecast is exact.
+  N4 PASSED: zero at L16, monotone, constant sign. E1 rel at L = 18/20/24/32/48: 6.8/9.6/20.4/44.5/82.2% (much steeper than banks).
+  N5 PASSED: arm A 15/15 exact; arm B 20/20 diverge; the ledger flags 20/20.
+  N6 PASSED: all 7 material LLM cells (B: sonnet_1, sonnet_4, sonnet_5; B3: haiku_4, opus_2, opus_3, sonnet_5) have min length 20 or 24 (code review).
+  Exploratory (scripts/eia_entry_q.py, not pre-registered): mean d = MASE(naive) - MASE(HA) by entry cohort.
+     EIA: incumbent -0.568, Q1 -0.135, Q2 -0.124, Q3 +0.017, Q4 +0.017.
+     Banks: Q1-Q4 entrants within -3.03..-2.69 (bank_lev) and -1.05..-0.82 (bank_cash), against SDs of about 2-4.
+     Entry calendar quarter is outcome-relevant for power plants, not for banks; the mechanism (technology mix, seasonality) is untested.
+
+--- mechanism for the EIA entry-quarter effect (scripts/mechanism_eia.py) ---
+dc5e8f96789533c0bf19b045849b91a498b07342de723e990d196eee69fcc708  scripts/mechanism_eia.py
+frozen 2026-11-19T13:43Z, before the script was run. Data: EIA-860 2024 (eia8602024.zip, 22.1 MB, sha256 0aaae048...; data/raw/eia860/MANIFEST.csv).
+Plant technology = the technology of the largest generator (Operable + Retired sheets), in 10 groups plus other/unmatched.
+Two candidate mechanisms: (T) technology mix differs by entry quarter; (H) entry quarter proxies entry year / history length.
+Predictions (entrants only; d = MASE(naive) - MASE(HA); "spread" = max - min of the entry-quarter coefficients, Q1 = 0):
+  M1 Technology composition differs by entry quarter: chi-square p < 0.001.
+  M2 Adding technology fixed effects cuts the entry-quarter spread by >= 50%.
+  M3 Technology explains more than history: the spread with tech FE < the spread with entry-year FE.
+  M4 With tech + entry-year FE, the entry-quarter joint F-test has p > 0.05.
+  M5 In the no-refit decomposition of B1 with technology cells, between-technology composition T1 is >= 50% of the selection part (T1+T2).
+Outcome mechanism, graded 2026-11-19T13:46Z (results_win_eia/mechanism/; 93.2% of plants matched to an EIA-860 technology):
+  M1 PASSED: chi2 = 972.5, p ~ 1e-187. The solar share of entrants rises from 44% (Q1) to 54/62/63% (Q2/Q3/Q4); petroleum is 11% of Q1 entrants vs <= 3% later.
+  M2 FAILED: tech FE cut the entry-quarter spread from 0.153 to 0.092 = 40% (threshold 50%). The tech-only joint F p = 0.083.
+  M3 PASSED: the spread with tech FE (0.092) < with entry-year FE (0.119) < with length bins (0.137).
+  M4 FAILED (narrowly): with tech + entry-year FE, joint F p = 0.049 (threshold > 0.05).
+  M5 PASSED: in the B1 decomposition with technology cells, between-technology T1 = 64% of the selection part.
+  Reading: technology mix is the largest identified channel (about 40% of the entry-quarter spread, 64% of B1's selection effect).
+  History length/entry year is weaker. A residual within-technology entry-quarter effect remains (small-n cells such as petroleum/gas-steam Q3-Q4 are noisy).
+
+--- propositions (paper/PROOFS.md), numerical checks 2026-11-20T02:20Z on hanqing-win (not pre-registered predictions; verification of proved statements) ---
+546dfb68edbdcac04630d129d7a8cc2e1dc5adf2ce33e77f6e4c3c752406526e  paper/PROOFS.md
+c5db40facedf207da243c899956ecd8891b5be6a85f280032b0a73ea9a2e84d8  scripts/verify_props.py
+cab87d49d3e1c05fe8518db570eac883e68182cd804ed2a88945a4025673ba56  scripts/verify_prop4.py
+  Prop 1 identity + Prop 2(a), 2(b), 3(a) inequalities: hold in all 20 cases (B1, B2, x3, x4 x 5 panels). results_win/proofs/prop2_3_checks.csv
+  Prop 4(a) closed form vs measured G0_S0_L* shifts, task-1 reference: max abs error 8.3e-16 over 50 cases. prop4_checks_taskref.csv
+     A first check against the unfiltered regrid_clean reference gave errors <= 0.034 (population mismatch, the synthetic charter filter); kept as prop4_checks.csv.
+  Prop 4(b) premise (monotone m(n)): approximate only. See prop4_m_of_n.csv.

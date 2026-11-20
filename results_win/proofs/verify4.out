@@ -1,0 +1,57 @@
+bank_leverage done
+bank_cash_liquidity done
+bhc_leverage done
+bhc_cash_liquidity done
+eia_plants done
+max |predicted - measured| = 8.326672684688674e-16
+              panel  L  predicted  measured  abs_err
+bank_cash_liquidity  0   0.000000  0.000000      0.0
+bank_cash_liquidity 16   0.000000  0.000000      0.0
+bank_cash_liquidity 18  -0.011038 -0.011038      0.0
+bank_cash_liquidity 20  -0.025666 -0.025666      0.0
+bank_cash_liquidity 22  -0.038520 -0.038520      0.0
+bank_cash_liquidity 24  -0.051575 -0.051575      0.0
+bank_cash_liquidity 28  -0.082163 -0.082163      0.0
+bank_cash_liquidity 32  -0.104607 -0.104607      0.0
+bank_cash_liquidity 40  -0.179055 -0.179055      0.0
+bank_cash_liquidity 48  -0.245259 -0.245259      0.0
+      bank_leverage  0   0.000000  0.000000      0.0
+      bank_leverage 16   0.000000  0.000000      0.0
+      bank_leverage 18  -0.007863 -0.007863      0.0
+      bank_leverage 20  -0.018690 -0.018690      0.0
+      bank_leverage 22  -0.024760 -0.024760      0.0
+      bank_leverage 24  -0.034622 -0.034622      0.0
+      bank_leverage 28  -0.048877 -0.048877      0.0
+      bank_leverage 32  -0.071989 -0.071989      0.0
+      bank_leverage 40  -0.148045 -0.148045      0.0
+      bank_leverage 48  -0.204467 -0.204467      0.0
+ bhc_cash_liquidity  0   0.000000  0.000000      0.0
+ bhc_cash_liquidity 16   0.000000  0.000000      0.0
+ bhc_cash_liquidity 18  -0.024823 -0.024823      0.0
+ bhc_cash_liquidity 20  -0.050854 -0.050854      0.0
+ bhc_cash_liquidity 22  -0.076079 -0.076079      0.0
+ bhc_cash_liquidity 24  -0.101000 -0.101000      0.0
+ bhc_cash_liquidity 28  -0.143933 -0.143933      0.0
+ bhc_cash_liquidity 32  -0.180649 -0.180649      0.0
+ bhc_cash_liquidity 40  -0.262901 -0.262901      0.0
+ bhc_cash_liquidity 48  -0.340846 -0.340846      0.0
+       bhc_leverage  0   0.000000  0.000000      0.0
+       bhc_leverage 16   0.000000  0.000000      0.0
+       bhc_leverage 18  -0.050779 -0.050779      0.0
+       bhc_leverage 20  -0.091696 -0.091696      0.0
+       bhc_leverage 22  -0.137988 -0.137988      0.0
+       bhc_leverage 24  -0.169604 -0.169604      0.0
+       bhc_leverage 28  -0.227848 -0.227848      0.0
+       bhc_leverage 32  -0.295880 -0.295880      0.0
+       bhc_leverage 40  -0.452202 -0.452202      0.0
+       bhc_leverage 48  -0.602024 -0.602024      0.0
+         eia_plants  0   0.000000  0.000000      0.0
+         eia_plants 16   0.000000  0.000000      0.0
+         eia_plants 18  -0.016544 -0.016544      0.0
+         eia_plants 20  -0.023185 -0.023185      0.0
+         eia_plants 22  -0.039687 -0.039687      0.0
+         eia_plants 24  -0.049492 -0.049492      0.0
+         eia_plants 28  -0.078121 -0.078121      0.0
+         eia_plants 32  -0.107807 -0.107807      0.0
+         eia_plants 40  -0.158841 -0.158841      0.0
+         eia_plants 48  -0.199022 -0.199022      0.0

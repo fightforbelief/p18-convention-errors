@@ -1,0 +1,18 @@
+bhc_cash_liquidity G0_S0_L0 ok key_dev=0.0000
+bhc_cash_liquidity G0_S0_L16 ok key_dev=0.0260
+bhc_cash_liquidity G0_S0_L20 ok key_dev=0.0419
+bhc_cash_liquidity G0_S0_L24 ok key_dev=0.0600
+bhc_cash_liquidity G0_S1_L0 ok key_dev=0.0106
+bhc_cash_liquidity G0_S1_L16 ok key_dev=0.0371
+bhc_cash_liquidity G0_S1_L20 ok key_dev=0.0532
+bhc_cash_liquidity G0_S1_L24 ok key_dev=0.0713
+bhc_cash_liquidity G1_S0_L0 ok key_dev=0.0002
+bhc_cash_liquidity G1_S0_L16 ok key_dev=0.0262
+bhc_cash_liquidity G1_S0_L20 ok key_dev=0.0420
+bhc_cash_liquidity G1_S0_L24 ok key_dev=0.0601
+bhc_cash_liquidity G1_S1_L0 ok key_dev=0.0079
+bhc_cash_liquidity G1_S1_L16 ok key_dev=0.0342
+bhc_cash_liquidity G1_S1_L20 ok key_dev=0.0502
+bhc_cash_liquidity G1_S1_L24 ok key_dev=0.0683
+
+--- stderr ---

@@ -1,0 +1,17 @@
+# environments and caches
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+# LaTeX build files (main.pdf is kept)
+paper/*.aux
+paper/*.log
+paper/*.out
+paper/*.toc
+# raw data and work files live on hanqing-win only (see README / data/raw/eia923/MANIFEST.csv)
+data/raw/*.parquet
+data/raw/eia923/*.zip
+data/raw/eia860/*.zip
+data/work*/
+# remote upload staging
+uploads/

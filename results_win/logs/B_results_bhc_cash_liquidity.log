@@ -1,0 +1,22 @@
+bhc_cash_liquidity codex_1 ok key_dev=0.0305
+bhc_cash_liquidity codex_2 ok key_dev=0.0303
+bhc_cash_liquidity codex_3 ok key_dev=0.0305
+bhc_cash_liquidity codex_4 ok key_dev=0.0192
+bhc_cash_liquidity codex_5 ok key_dev=0.0276
+bhc_cash_liquidity haiku_1 ok key_dev=0.0417
+bhc_cash_liquidity haiku_2 ok key_dev=0.0185
+bhc_cash_liquidity haiku_3 ok key_dev=0.0149
+bhc_cash_liquidity haiku_4 ok key_dev=0.0146
+bhc_cash_liquidity haiku_5 ok key_dev=0.0421
+bhc_cash_liquidity opus_1 ok key_dev=0.0501
+bhc_cash_liquidity opus_2 ok key_dev=0.0384
+bhc_cash_liquidity opus_3 ok key_dev=0.0396
+bhc_cash_liquidity opus_4 ok key_dev=0.0552
+bhc_cash_liquidity opus_5 ok key_dev=0.0555
+bhc_cash_liquidity sonnet_1 ok key_dev=0.0539
+bhc_cash_liquidity sonnet_2 ok key_dev=0.0546
+bhc_cash_liquidity sonnet_3 ok key_dev=0.0554
+bhc_cash_liquidity sonnet_4 ok key_dev=0.0732
+bhc_cash_liquidity sonnet_5 ok key_dev=0.0732
+
+--- stderr ---

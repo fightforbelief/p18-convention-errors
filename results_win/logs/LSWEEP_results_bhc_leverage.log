@@ -1,0 +1,8 @@
+bhc_leverage G0_S0_L18 ok key_dev=0.0340
+bhc_leverage G0_S0_L22 ok key_dev=0.0513
+bhc_leverage G0_S0_L28 ok key_dev=0.0818
+bhc_leverage G0_S0_L32 ok key_dev=0.1043
+bhc_leverage G0_S0_L40 ok key_dev=0.1510
+bhc_leverage G0_S0_L48 ok key_dev=0.2020
+
+--- stderr ---

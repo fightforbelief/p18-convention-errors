@@ -1,0 +1,33 @@
+raw rows=237322 banks=4000 span=1976-03-31..2020-03-31 incumbent share=0.12
+clean: {'n_banks': 3274, 'delta': -2.5253081591330377, 'lo': -2.661861259362696, 'hi': -2.392937602458163, 'winner': 'Naive'}
+B1_grid_3mo_step done
+B2_survivor_join done
+B3_ffill_balanced done
+B4_warmup_dropna done
+B5_mase_scale_leak done
+x1_step_90d done
+x2_quarterend_rollforward done
+x3_active_at_end done
+x4_long_history done
+x5_next_target_dropna done
+x6_many_to_many_link done
+x7_winsorize done
+x8_global_zscore done
+x9_benign_reshuffle done
+                     pipeline  rows_kept  banks_kept  entrant_share_eval  delta  shift  harmful  schema_flag  stats_flag  ledger_flag  prov_ok  max_spread  v1_flag                                                                       v1_info
+0            B1_grid_3mo_step      0.593       0.588               0.777 -2.517  0.003    False        False        True         True     True       0.987     True   {'R1_keys': True, 'R2_floor': True, 'R3_uniform': False, 'max_diff': 0.977}
+1            B2_survivor_join      0.460       0.272               0.942 -3.191 -0.263     True        False        True         True     True       0.983     True  {'R1_keys': True, 'R2_floor': False, 'R3_uniform': False, 'max_diff': 0.977}
+2           B3_ffill_balanced      2.111       1.000               0.873 -4.182 -0.656     True        False        True         True    False       0.000     True  {'R1_keys': False, 'R2_floor': True, 'R3_uniform': True, 'max_diff': -0.003}
+3            B4_warmup_dropna      0.813       0.862               0.864 -2.502  0.009    False        False       False         True     True       0.988     True   {'R1_keys': True, 'R2_floor': True, 'R3_uniform': False, 'max_diff': 0.986}
+4          B5_mase_scale_leak      0.986       0.984               0.868 -2.318  0.082     True        False       False        False     True       0.010    False      {'R1_keys': True, 'R2_floor': True, 'R3_uniform': True, 'max_diff': 0.0}
+5                 x1_step_90d      0.000       0.005                 NaN    NaN    NaN     True        False        True        False     True       0.009     True  {'R1_keys': True, 'R2_floor': False, 'R3_uniform': True, 'max_diff': -0.001}
+6   x2_quarterend_rollforward      0.986       0.984               0.868 -2.525  0.000    False        False       False         True    False       0.251     True  {'R1_keys': False, 'R2_floor': True, 'R3_uniform': False, 'max_diff': 0.249}
+7            x3_active_at_end      0.482       0.286               0.940 -3.197 -0.266     True        False        True         True     True       0.959     True  {'R1_keys': True, 'R2_floor': False, 'R3_uniform': False, 'max_diff': 0.949}
+8             x4_long_history      0.839       0.546               0.869 -2.925 -0.158     True        False       False         True     True       0.397     True   {'R1_keys': True, 'R2_floor': True, 'R3_uniform': False, 'max_diff': 0.388}
+9       x5_next_target_dropna      0.970       0.980               0.868 -2.349  0.070     True        False       False        False     True       0.012    False     {'R1_keys': True, 'R2_floor': True, 'R3_uniform': True, 'max_diff': 0.01}
+10       x6_many_to_many_link      0.986       0.984               0.868 -2.527 -0.001    False        False       False         True    False       0.010    False      {'R1_keys': True, 'R2_floor': True, 'R3_uniform': True, 'max_diff': 0.0}
+11               x7_winsorize      0.986       0.984               0.868 -2.569 -0.017    False        False       False         True    False       0.010    False      {'R1_keys': True, 'R2_floor': True, 'R3_uniform': True, 'max_diff': 0.0}
+12           x8_global_zscore      0.986       0.984               0.868 -2.525  0.000    False        False        True         True    False       0.010    False      {'R1_keys': True, 'R2_floor': True, 'R3_uniform': True, 'max_diff': 0.0}
+13        x9_benign_reshuffle      0.986       0.984               0.868 -2.525  0.000    False        False       False        False     True       0.010    False      {'R1_keys': True, 'R2_floor': True, 'R3_uniform': True, 'max_diff': 0.0}
+
+--- stderr ---

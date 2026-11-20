@@ -1,0 +1,21 @@
+bhc_leverage codex_1 ok key_dev=0.0324
+bhc_leverage codex_2 ok key_dev=0.0304
+bhc_leverage codex_4 ok key_dev=0.0324
+bhc_leverage codex_5 ok key_dev=0.0324
+bhc_leverage haiku_1 ok key_dev=0.0477
+bhc_leverage haiku_2 ok key_dev=0.0443
+bhc_leverage haiku_3 ok key_dev=0.0274
+bhc_leverage haiku_4 ok key_dev=0.0445
+bhc_leverage haiku_5 ok key_dev=0.0160
+bhc_leverage opus_1 ok key_dev=0.0577
+bhc_leverage opus_2 ok key_dev=0.0784
+bhc_leverage opus_3 ok key_dev=0.0772
+bhc_leverage opus_4 ok key_dev=0.0575
+bhc_leverage opus_5 ok key_dev=0.0414
+bhc_leverage sonnet_1 ok key_dev=0.0575
+bhc_leverage sonnet_2 ok key_dev=0.0414
+bhc_leverage sonnet_3 ok key_dev=0.0574
+bhc_leverage sonnet_4 ok key_dev=0.0570
+bhc_leverage sonnet_5 ok key_dev=0.0679
+
+--- stderr ---

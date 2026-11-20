@@ -1,0 +1,7 @@
+# P18 project environment (hanqing-win: .\.venv\Scripts\python.exe). Versions match the Mac pilot runs of 2026-11-19.
+pandas==3.1.1
+numpy==2.5.5
+scipy==1.18.1
+pyarrow==26.0.1
+openpyxl==3.1.5
+xlrd==2.0.2

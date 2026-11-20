@@ -1,0 +1,31 @@
+done synthetic:0
+done C:/Users/hanqi/Desktop/Projects/Research_Portfolio_2026/p18-convention-errors/data/raw/bank_leverage_panel.parquet
+            panel                   pipeline  total  T1_between  T2_within_sel  T3_alteration  forecast_T1T2  cohort_TV  heterogeneity_sd  ref_delta  ref_halfwidth  harm_ratio
+0     synthetic:0           B1_grid_3mo_step  0.340       0.340          0.000          0.000          0.340      0.233             1.016     -0.775          0.067       5.085
+1     synthetic:0           B2_survivor_join -0.080      -0.080          0.000          0.000         -0.080      0.288             1.016     -0.775          0.067       1.191
+2     synthetic:0          B3_ffill_balanced -0.344       0.000          0.000         -0.344          0.000      0.000             1.016     -0.775          0.067       5.149
+3     synthetic:0           B4_warmup_dropna  0.066       0.036         -0.046          0.076         -0.011      0.035             1.016     -0.775          0.067       0.983
+4     synthetic:0         B5_mase_scale_leak -0.005       0.000          0.000         -0.005          0.000      0.000             1.016     -0.775          0.067       0.070
+5     synthetic:0  x2_quarterend_rollforward  0.000       0.000          0.000          0.000          0.000      0.000             1.016     -0.775          0.067       0.000
+6     synthetic:0           x3_active_at_end -0.088      -0.088         -0.000         -0.000         -0.088      0.252             1.016     -0.775          0.067       1.312
+7     synthetic:0            x4_long_history  0.033       0.110         -0.077          0.000          0.033      0.077             1.016     -0.775          0.067       0.501
+8     synthetic:0      x5_next_target_dropna  0.013       0.000          0.000          0.013          0.000      0.000             1.016     -0.775          0.067       0.201
+9     synthetic:0       x6_many_to_many_link  0.004       0.000          0.000          0.004          0.000      0.000             1.016     -0.775          0.067       0.061
+10    synthetic:0               x7_winsorize -0.029       0.001         -0.001         -0.029          0.000      0.001             1.016     -0.775          0.067       0.438
+11    synthetic:0           x8_global_zscore  0.000       0.000          0.000          0.000          0.000      0.000             1.016     -0.775          0.067       0.000
+12    synthetic:0        x9_benign_reshuffle  0.000       0.000          0.000          0.000          0.000      0.000             1.016     -0.775          0.067       0.000
+0   bank_leverage           B1_grid_3mo_step -0.079      -0.079          0.000         -0.000         -0.079      0.145             0.501     -2.923          0.137       0.574
+1   bank_leverage           B2_survivor_join -0.578      -0.578          0.000          0.000         -0.578      0.745             0.501     -2.923          0.137       4.228
+2   bank_leverage          B3_ffill_balanced -2.764       0.021          0.000         -2.785          0.022      0.037             0.501     -2.923          0.137      20.207
+3   bank_leverage           B4_warmup_dropna  0.181      -0.014         -0.024          0.219         -0.038      0.036             0.501     -2.923          0.137       1.325
+4   bank_leverage         B5_mase_scale_leak  0.295       0.000          0.000          0.295          0.000      0.000             0.501     -2.923          0.137       2.156
+5   bank_leverage  x2_quarterend_rollforward  0.000       0.000          0.000          0.000          0.000      0.000             0.501     -2.923          0.137       0.000
+6   bank_leverage           x3_active_at_end -0.538      -0.544          0.006          0.000         -0.538      0.699             0.501     -2.923          0.137       3.936
+7   bank_leverage            x4_long_history -0.153      -0.042         -0.112          0.000         -0.153      0.089             0.501     -2.923          0.137       1.121
+8   bank_leverage      x5_next_target_dropna  0.155      -0.001         -0.004          0.159         -0.005      0.003             0.501     -2.923          0.137       1.130
+9   bank_leverage       x6_many_to_many_link -0.007       0.000          0.000         -0.007          0.000      0.000             0.501     -2.923          0.137       0.049
+10  bank_leverage               x7_winsorize -0.112      -0.001         -0.005         -0.106          0.000      0.002             0.501     -2.923          0.137       0.819
+11  bank_leverage           x8_global_zscore  0.000       0.000          0.000          0.000          0.000      0.000             0.501     -2.923          0.137       0.000
+12  bank_leverage        x9_benign_reshuffle  0.000       0.000          0.000          0.000          0.000      0.000             0.501     -2.923          0.137       0.000
+
+--- stderr ---

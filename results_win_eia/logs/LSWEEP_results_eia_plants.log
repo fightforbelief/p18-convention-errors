@@ -1,0 +1,8 @@
+eia_plants G0_S0_L18 ok key_dev=0.0563
+eia_plants G0_S0_L22 ok key_dev=0.0789
+eia_plants G0_S0_L28 ok key_dev=0.1170
+eia_plants G0_S0_L32 ok key_dev=0.1481
+eia_plants G0_S0_L40 ok key_dev=0.2165
+eia_plants G0_S0_L48 ok key_dev=0.2777
+
+--- stderr ---

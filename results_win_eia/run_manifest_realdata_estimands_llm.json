@@ -1,0 +1,187 @@
+{
+ "stages": [
+  "realdata",
+  "estimands",
+  "llm"
+ ],
+ "python": "3.12.10",
+ "platform": "Windows-11-10.0.26200-SP0",
+ "versions": {
+  "pandas": "3.1.1",
+  "numpy": "2.5.5",
+  "scipy": "1.18.1",
+  "pyarrow": "26.0.1"
+ },
+ "inputs": {
+  "eia_plants": "5ed2de01b7533fa3491cde261f0876a2bc759146b76ac1b5498972b83e96ece1"
+ },
+ "code": {
+  "llm_bugs\\ablation.py": "6b3af35e9972c6249cec964edeb998eb507d9eed10ad7f5648a765a9cc437716",
+  "llm_bugs\\grade3.py": "989435794db8519d47d4bcd82d2c6c796263d9adef6d114df436304e42993e18",
+  "llm_bugs\\grade_abl.py": "1aa0245fe89bf875c308b0c7a2d23fd1c56351203c496c75d14626a218cbf82c",
+  "llm_bugs\\harness.py": "3e69e3069ec8c22cd84147e405c510e0799a38c583bf6bb58e035209a50dead7",
+  "llm_bugs\\make_inputs.py": "8eb84a7ffd1c5bd963c82d648707c4e66b263f5e30cbd763f30fbdca760ac482",
+  "llm_bugs\\make_inputs3.py": "9e41364527965b0d889c3fe671ea2c8be396f0885b33b3d4685ba141a88eb553",
+  "llm_bugs\\reference.py": "9d58e36aa29d3368ea873d8a21180f0d446a93ec420f9c09f2b980c0df22a721",
+  "llm_bugs\\reference_region.py": "653f1f946c004ac71bee134789ab5753136ef0fb0d08a88cf62ef5ddf4af365f",
+  "llm_bugs\\reference_yoy.py": "ed656756d7d37cbac0ab367c55bc0ef385af39d46d0ba66062771fe017e1e8df",
+  "llm_bugs\\run_one.py": "01ab7b91d37d0a7c1b92860ab62bfae01ca5d51fedefc375225148bc0ef92d66",
+  "pilot\\decomp.py": "50a7b6d5cd0997bd3bda64b2e0d8342fe0bc76e2fb573b1a28f9b568a04c7b8f",
+  "pilot\\estimands.py": "78d75daa5218cc4c86a6a78cf78bcc78f0f71bfbc129cdecb6eb5acd58e669c2",
+  "pilot\\grade_v2.py": "09cc95db3bd02f55e624d08b0ce5f7a3af690a0eb3c8fc682cd4ec54067841cd",
+  "pilot\\heldout_v0.py": "f78b15951ff94708e64b0bfbb5c6fbf2e224203d2084d5625d19deb38968e654",
+  "pilot\\ledger_frozen_v0.py": "39b156e65fe1c690eee8fe0ad92b912f1b9d1fb6d9bc6b1fd663c5d2264f1d0f",
+  "pilot\\ledger_v1.py": "ba7ac1a690ef1752c0acb7c617d5c01a0944cc324713159080f3bb5af454ac0d",
+  "pilot\\llm_review.py": "6b1953006724f23071327947cec999a23f451362bebbfe16545dbd19016d01da",
+  "pilot\\pilot_v0.py": "39b156e65fe1c690eee8fe0ad92b912f1b9d1fb6d9bc6b1fd663c5d2264f1d0f",
+  "pilot\\realdata_v0.py": "6aad372db150831cc9ec9cdba31b1804502ea2e7674db2e646cada55378321e7"
+ },
+ "steps": [
+  {
+   "tag": "realdata_eia_plants_all",
+   "args": [
+    "realdata_v0.py",
+    "C:/Users/hanqi/Desktop/Projects/Research_Portfolio_2026/p18-convention-errors/data/raw/eia_plants_panel.parquet",
+    "all"
+   ],
+   "cwd": "pilot",
+   "rc": 0,
+   "seconds": 124.8
+  },
+  {
+   "tag": "estimands_eia_plants",
+   "args": [
+    "estimands.py",
+    "C:/Users/hanqi/Desktop/Projects/Research_Portfolio_2026/p18-convention-errors/data/raw/eia_plants_panel.parquet"
+   ],
+   "cwd": "pilot",
+   "rc": 0,
+   "seconds": 128.5
+  },
+  {
+   "tag": "t3inputs_eia_plants",
+   "args": [
+    "-c",
+    "import sys,os; sys.path.insert(0,'../pilot'); os.chdir('../pilot'); import realdata_v0 as RD; os.chdir('../llm_bugs');import make_inputs3 as M3; raw=RD.load(sys.argv[1]); d=sys.argv[2]; os.makedirs(d,exist_ok=True);M3.to_calls(raw).to_parquet(d+'/calls.parquet'); cur,h=M3.make(raw);cur.to_parquet(d+'/directory.parquet'); h.to_parquet(d+'/history.parquet')",
+    "C:/Users/hanqi/Desktop/Projects/Research_Portfolio_2026/p18-convention-errors/data/raw/eia_plants_panel.parquet",
+    "C:\\Users\\hanqi\\Desktop\\Projects\\Research_Portfolio_2026\\p18-convention-errors\\data\\work_eia\\t3\\inputs_eia_plants"
+   ],
+   "cwd": "llm_bugs",
+   "rc": 0,
+   "seconds": 2.6
+  },
+  {
+   "tag": "A_results_eia_plants",
+   "args": [
+    "harness.py",
+    "C:/Users/hanqi/Desktop/Projects/Research_Portfolio_2026/p18-convention-errors/data/raw/eia_plants_panel.parquet",
+    "pipelines",
+    "C:\\Users\\hanqi\\Desktop\\Projects\\Research_Portfolio_2026\\p18-convention-errors\\data\\work_eia\\t12_A_results",
+    "reference",
+    "A_results"
+   ],
+   "cwd": "llm_bugs",
+   "rc": 0,
+   "seconds": 48.4
+  },
+  {
+   "tag": "B_results_eia_plants",
+   "args": [
+    "harness.py",
+    "C:/Users/hanqi/Desktop/Projects/Research_Portfolio_2026/p18-convention-errors/data/raw/eia_plants_panel.parquet",
+    "pipelines_B",
+    "C:\\Users\\hanqi\\Desktop\\Projects\\Research_Portfolio_2026\\p18-convention-errors\\data\\work_eia\\t12_B_results",
+    "reference",
+    "B_results"
+   ],
+   "cwd": "llm_bugs",
+   "rc": 0,
+   "seconds": 68.3
+  },
+  {
+   "tag": "A2_results_eia_plants",
+   "args": [
+    "harness.py",
+    "C:/Users/hanqi/Desktop/Projects/Research_Portfolio_2026/p18-convention-errors/data/raw/eia_plants_panel.parquet",
+    "pipelines_A2",
+    "C:\\Users\\hanqi\\Desktop\\Projects\\Research_Portfolio_2026\\p18-convention-errors\\data\\work_eia\\t12_A2_results",
+    "reference_yoy",
+    "A2_results"
+   ],
+   "cwd": "llm_bugs",
+   "rc": 0,
+   "seconds": 23.7
+  },
+  {
+   "tag": "B2_results_eia_plants",
+   "args": [
+    "harness.py",
+    "C:/Users/hanqi/Desktop/Projects/Research_Portfolio_2026/p18-convention-errors/data/raw/eia_plants_panel.parquet",
+    "pipelines_B2",
+    "C:\\Users\\hanqi\\Desktop\\Projects\\Research_Portfolio_2026\\p18-convention-errors\\data\\work_eia\\t12_B2_results",
+    "reference_yoy",
+    "B2_results"
+   ],
+   "cwd": "llm_bugs",
+   "rc": 0,
+   "seconds": 58.4
+  },
+  {
+   "tag": "A3_results_eia_plants",
+   "args": [
+    "harness.py",
+    "C:/Users/hanqi/Desktop/Projects/Research_Portfolio_2026/p18-convention-errors/data/raw/eia_plants_panel.parquet",
+    "pipelines_A3",
+    "C:\\Users\\hanqi\\Desktop\\Projects\\Research_Portfolio_2026\\p18-convention-errors\\data\\work_eia\\t3_A3_results",
+    "reference_region",
+    "A3_results"
+   ],
+   "cwd": "llm_bugs",
+   "rc": 0,
+   "seconds": 21.7
+  },
+  {
+   "tag": "B3_results_eia_plants",
+   "args": [
+    "harness.py",
+    "C:/Users/hanqi/Desktop/Projects/Research_Portfolio_2026/p18-convention-errors/data/raw/eia_plants_panel.parquet",
+    "pipelines_B3",
+    "C:\\Users\\hanqi\\Desktop\\Projects\\Research_Portfolio_2026\\p18-convention-errors\\data\\work_eia\\t3_B3_results",
+    "reference_region",
+    "B3_results"
+   ],
+   "cwd": "llm_bugs",
+   "rc": 0,
+   "seconds": 51.6
+  },
+  {
+   "tag": "ABL_results_eia_plants",
+   "args": [
+    "harness.py",
+    "C:/Users/hanqi/Desktop/Projects/Research_Portfolio_2026/p18-convention-errors/data/raw/eia_plants_panel.parquet",
+    "pipelines_abl",
+    "C:\\Users\\hanqi\\Desktop\\Projects\\Research_Portfolio_2026\\p18-convention-errors\\data\\work_eia\\t12_ABL_results",
+    "reference",
+    "ABL_results"
+   ],
+   "cwd": "llm_bugs",
+   "rc": 0,
+   "seconds": 79.4
+  },
+  {
+   "tag": "LSWEEP_results_eia_plants",
+   "args": [
+    "harness.py",
+    "C:/Users/hanqi/Desktop/Projects/Research_Portfolio_2026/p18-convention-errors/data/raw/eia_plants_panel.parquet",
+    "pipelines_Lsweep",
+    "C:\\Users\\hanqi\\Desktop\\Projects\\Research_Portfolio_2026\\p18-convention-errors\\data\\work_eia\\t12_LSWEEP_results",
+    "reference",
+    "LSWEEP_results"
+   ],
+   "cwd": "llm_bugs",
+   "rc": 0,
+   "seconds": 27.6
+  }
+ ],
+ "total_seconds": 635.6
+}

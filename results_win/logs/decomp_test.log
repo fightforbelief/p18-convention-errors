@@ -1,0 +1,31 @@
+done C:/Users/hanqi/Desktop/Projects/Research_Portfolio_2026/p18-convention-errors/data/raw/bhc_cash_liquidity_panel.parquet
+done C:/Users/hanqi/Desktop/Projects/Research_Portfolio_2026/p18-convention-errors/data/raw/bank_cash_liquidity_panel.parquet
+                  panel                   pipeline  total  T1_between  T2_within_sel  T3_alteration  forecast_T1T2  cohort_TV  heterogeneity_sd  ref_delta  ref_halfwidth  harm_ratio
+0    bhc_cash_liquidity           B1_grid_3mo_step  0.041       0.041          0.000         -0.000          0.041      0.407             0.263     -0.933          0.082       0.508
+1    bhc_cash_liquidity           B2_survivor_join -0.151      -0.151          0.000          0.000         -0.151      0.706             0.263     -0.933          0.082       1.843
+2    bhc_cash_liquidity          B3_ffill_balanced -0.935       0.005          0.000         -0.941          0.006      0.045             0.263     -0.933          0.082      11.452
+3    bhc_cash_liquidity           B4_warmup_dropna -0.003      -0.010         -0.098          0.105         -0.108      0.045             0.263     -0.933          0.082       0.035
+4    bhc_cash_liquidity         B5_mase_scale_leak -0.006       0.000          0.000         -0.006          0.000      0.000             0.263     -0.933          0.082       0.075
+5    bhc_cash_liquidity  x2_quarterend_rollforward  0.000       0.000          0.000          0.000          0.000      0.000             0.263     -0.933          0.082       0.000
+6    bhc_cash_liquidity           x3_active_at_end -0.137      -0.141          0.004         -0.000         -0.137      0.655             0.263     -0.933          0.082       1.680
+7    bhc_cash_liquidity            x4_long_history -0.213      -0.028         -0.185         -0.000         -0.213      0.113             0.263     -0.933          0.082       2.608
+8    bhc_cash_liquidity      x5_next_target_dropna -0.020      -0.000         -0.008         -0.011         -0.009      0.004             0.263     -0.933          0.082       0.248
+9    bhc_cash_liquidity       x6_many_to_many_link  0.006       0.000          0.000          0.006          0.000      0.000             0.263     -0.933          0.082       0.069
+10   bhc_cash_liquidity               x7_winsorize -0.006      -0.000          0.000         -0.006          0.000      0.000             0.263     -0.933          0.082       0.071
+11   bhc_cash_liquidity           x8_global_zscore  0.000       0.000          0.000          0.000          0.000      0.000             0.263     -0.933          0.082       0.000
+12   bhc_cash_liquidity        x9_benign_reshuffle  0.000       0.000          0.000          0.000          0.000      0.000             0.263     -0.933          0.082       0.000
+0   bank_cash_liquidity           B1_grid_3mo_step -0.003      -0.003          0.000          0.000         -0.003      0.173             0.203     -1.083          0.082       0.038
+1   bank_cash_liquidity           B2_survivor_join -0.249      -0.249          0.000          0.000         -0.249      0.763             0.203     -1.083          0.082       3.041
+2   bank_cash_liquidity          B3_ffill_balanced -1.013       0.007          0.000         -1.020          0.008      0.044             0.203     -1.083          0.082      12.359
+3   bank_cash_liquidity           B4_warmup_dropna -0.005      -0.012         -0.064          0.071         -0.076      0.039             0.203     -1.083          0.082       0.063
+4   bank_cash_liquidity         B5_mase_scale_leak -0.007       0.000          0.000         -0.007          0.000      0.000             0.203     -1.083          0.082       0.084
+5   bank_cash_liquidity  x2_quarterend_rollforward  0.000       0.000          0.000          0.000          0.000      0.000             0.203     -1.083          0.082       0.000
+6   bank_cash_liquidity           x3_active_at_end -0.228      -0.228         -0.000         -0.000         -0.228      0.706             0.203     -1.083          0.082       2.782
+7   bank_cash_liquidity            x4_long_history -0.176      -0.029         -0.147          0.000         -0.176      0.088             0.203     -1.083          0.082       2.151
+8   bank_cash_liquidity      x5_next_target_dropna -0.001      -0.002         -0.005          0.006         -0.007      0.005             0.203     -1.083          0.082       0.015
+9   bank_cash_liquidity       x6_many_to_many_link -0.013       0.000          0.000         -0.013          0.000      0.000             0.203     -1.083          0.082       0.160
+10  bank_cash_liquidity               x7_winsorize -0.005      -0.000         -0.002         -0.003          0.000      0.003             0.203     -1.083          0.082       0.064
+11  bank_cash_liquidity           x8_global_zscore -0.000       0.000          0.000         -0.000          0.000      0.000             0.203     -1.083          0.082       0.000
+12  bank_cash_liquidity        x9_benign_reshuffle  0.000       0.000          0.000          0.000          0.000      0.000             0.203     -1.083          0.082       0.000
+
+--- stderr ---

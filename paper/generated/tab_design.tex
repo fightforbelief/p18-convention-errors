@@ -1,0 +1,14 @@
+\begin{tabular}{llrrrrr}
+\toprule
+Pipeline & Selects on & Bank leverage & Bank cash & BHC leverage & BHC cash & Power plants \\
+\midrule
+B1 grid step (motivating) & entry quarter & 1.7$^{\ell}$ & 2.5$^{\ell}$ & 0.8$^{\ell}$ & 2.6$^{\ell}$ & \textbf{17.3}$^{\ell}$ \\
+B2 latest-snapshot join & exit status & \textbf{21.7}$^{\ell}$ & \textbf{19.1}$^{\ell}$ & \textbf{23.8}$^{\ell}$ & \textbf{16.6}$^{\ell}$ & \textbf{47.7}$^{\ell}$ \\
+x3 active at sample end & exit status & \textbf{21.3}$^{\ell}$ & \textbf{17.8}$^{\ell}$ & \textbf{23.7}$^{\ell}$ & \textbf{15.9}$^{\ell}$ & \textbf{42.0}$^{\ell}$ \\
+x4 long-history filter & history length & 4.4$^{\ell}$ & \textbf{15.4}$^{\ell}$ & \textbf{16.7}$^{\ell}$ & \textbf{25.9}$^{\ell}$ & \textbf{65.8}$^{\ell}$ \\
+B4 warm-up \texttt{dropna} & age (alteration) & 6.2$^{\ell}$ & 1.1$^{\ell}$ & 0.3$^{\ell}$ & 1.8$^{\ell}$ & 7.5$^{\ell}$ \\
+B3 balanced + ffill & alteration & \textbf{86.2}$^{\ell}$ & \textbf{91.8}$^{\ell}$ & \textbf{71.5}$^{\ell}$ & \textbf{90.9}$^{\ell}$ & \textbf{122.9}$^{\ell}$ \\
+B5 scale leak & alteration & 9.4 & 0.8 & 8.5 & 0.4 & 8.4 \\
+x7 winsorize & alteration & 2.5 & 0.8 & 1.6 & 1.3 & 4.3 \\
+\bottomrule
+\end{tabular}

@@ -1,0 +1,17 @@
+bhc_cash_liquidity haiku_1 ok key_dev=0.0000
+bhc_cash_liquidity haiku_2 ok key_dev=0.0000
+bhc_cash_liquidity haiku_3 ok key_dev=0.0000
+bhc_cash_liquidity haiku_4 ok key_dev=0.0000
+bhc_cash_liquidity haiku_5 ok key_dev=0.0000
+bhc_cash_liquidity opus_1 ok key_dev=0.0000
+bhc_cash_liquidity opus_2 ok key_dev=0.0000
+bhc_cash_liquidity opus_3 ok key_dev=0.0000
+bhc_cash_liquidity opus_4 ok key_dev=0.0000
+bhc_cash_liquidity opus_5 ok key_dev=0.0000
+bhc_cash_liquidity sonnet_1 ok key_dev=0.0000
+bhc_cash_liquidity sonnet_2 ok key_dev=0.0000
+bhc_cash_liquidity sonnet_3 ok key_dev=0.0000
+bhc_cash_liquidity sonnet_4 ok key_dev=0.0000
+bhc_cash_liquidity sonnet_5 ok key_dev=0.0000
+
+--- stderr ---

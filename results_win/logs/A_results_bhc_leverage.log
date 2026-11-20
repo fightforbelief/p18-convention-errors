@@ -1,0 +1,17 @@
+bhc_leverage haiku_1 ok key_dev=0.0000
+bhc_leverage haiku_2 ok key_dev=0.0000
+bhc_leverage haiku_3 ok key_dev=0.0000
+bhc_leverage haiku_4 ok key_dev=0.0000
+bhc_leverage haiku_5 ok key_dev=0.0000
+bhc_leverage opus_1 ok key_dev=0.0000
+bhc_leverage opus_2 ok key_dev=0.0000
+bhc_leverage opus_3 ok key_dev=0.0000
+bhc_leverage opus_4 ok key_dev=0.0000
+bhc_leverage opus_5 ok key_dev=0.0000
+bhc_leverage sonnet_1 ok key_dev=0.0000
+bhc_leverage sonnet_2 ok key_dev=0.0000
+bhc_leverage sonnet_3 ok key_dev=0.0000
+bhc_leverage sonnet_4 ok key_dev=0.0000
+bhc_leverage sonnet_5 ok key_dev=0.0000
+
+--- stderr ---

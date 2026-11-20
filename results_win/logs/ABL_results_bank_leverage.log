@@ -1,0 +1,18 @@
+bank_leverage G0_S0_L0 ok key_dev=0.0000
+bank_leverage G0_S0_L16 ok key_dev=0.0106
+bank_leverage G0_S0_L20 ok key_dev=0.0159
+bank_leverage G0_S0_L24 ok key_dev=0.0241
+bank_leverage G0_S1_L0 ok key_dev=0.0093
+bank_leverage G0_S1_L16 ok key_dev=0.0203
+bank_leverage G0_S1_L20 ok key_dev=0.0259
+bank_leverage G0_S1_L24 ok key_dev=0.0342
+bank_leverage G1_S0_L0 ok key_dev=0.0007
+bank_leverage G1_S0_L16 ok key_dev=0.0113
+bank_leverage G1_S0_L20 ok key_dev=0.0166
+bank_leverage G1_S0_L24 ok key_dev=0.0248
+bank_leverage G1_S1_L0 ok key_dev=0.0030
+bank_leverage G1_S1_L16 ok key_dev=0.0136
+bank_leverage G1_S1_L20 ok key_dev=0.0190
+bank_leverage G1_S1_L24 ok key_dev=0.0272
+
+--- stderr ---

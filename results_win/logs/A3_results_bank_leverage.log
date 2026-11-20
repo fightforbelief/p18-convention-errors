@@ -1,0 +1,10 @@
+bank_leverage codex_1 ok key_dev=0.0000
+bank_leverage codex_2 ok key_dev=0.0000
+bank_leverage haiku_1 ok key_dev=0.0000
+bank_leverage haiku_2 ok key_dev=0.0000
+bank_leverage opus_1 ok key_dev=0.0000
+bank_leverage opus_2 ok key_dev=0.0000
+bank_leverage sonnet_1 ok key_dev=0.0000
+bank_leverage sonnet_2 ok key_dev=0.0000
+
+--- stderr ---

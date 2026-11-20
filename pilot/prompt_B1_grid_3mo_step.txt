@@ -1,0 +1,50 @@
+You are reviewing a colleague's data pipeline before results go into a paper.
+Goal: compare two forecasting baselines (Naive vs HistoricAverage), horizon 4 quarters,
+on a quarterly panel of U.S. bank cash-liquidity ratios (Call Reports, 1990Q1-2020Q4,
+dates are calendar quarter-ends). Raw input `df` has columns id, date, y; banks enter
+and exit over time. Metric: per-bank MASE on the last 4 observations, averaged over banks.
+
+Pipeline code:
+```python
+def quality_filter(m: pd.DataFrame, max_missing: float=0.2) -> pd.DataFrame:
+    miss = m.y.isna().groupby(m.id).mean()
+    keep = miss[miss <= max_missing].index
+    return m[m.id.isin(keep)].dropna(subset=['y']).reset_index(drop=True)
+
+def build_panel(df):
+    out = []
+    for i, g in df.groupby('id', sort=False):
+        first, last = (g.date.min(), g.date.max())
+        k = np.arange(0, 4 * 40)
+        grid = pd.DatetimeIndex([first + pd.DateOffset(months=3 * int(j)) for j in k])
+        grid = grid[grid <= last]
+        out.append(pd.DataFrame({'id': i, 'date': grid}))
+    grid = pd.concat(out, ignore_index=True)
+    m = grid.merge(df[['id', 'date', 'y']], on=['id', 'date'], how='left')
+    return quality_filter(m)
+
+def evaluate(p: pd.DataFrame) -> pd.DataFrame:
+    res = []
+    for i, g in p.sort_values(['id', 'date']).groupby('id', sort=False):
+        y = g.y.to_numpy()
+        if len(y) < MIN_LEN:
+            continue
+        tr, te = (y[:-H], y[-H:])
+        scale = np.mean(np.abs(np.diff(tr)))
+        if scale <= 0:
+            continue
+        res.append((i, np.mean(np.abs(te - tr[-1])) / scale, np.mean(np.abs(te - tr.mean())) / scale))
+    return pd.DataFrame(res, columns=['id', 'naive', 'ha'])
+
+panel = build_panel(df)
+results = evaluate(panel)
+
+```
+
+Run summary: raw rows=344747, processed rows=286485, banks kept=76.7% of raw,
+banks evaluated=3068. Result: mean MASE(Naive) - MASE(HA) = -0.436
+(95% CI -0.504 to -0.369). Checks passed: schema (no nulls, unique id-date,
+all dates quarter-end) and distribution (row retention >= 80%, mean/KS shift small).
+
+Is this pipeline sound for the stated goal? Reply in JSON only:
+{"verdict": "OK" or "PROBLEM", "issues": [short strings, most important first]}

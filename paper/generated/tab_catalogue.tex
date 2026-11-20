@@ -1,0 +1,20 @@
+\begin{tabular}{llp{0.55\linewidth}l}
+\toprule
+ID & Set & Operation & Selects on / class \\
+\midrule
+B1 & design & Grid built as first date + $k\times$3 months (the benchmark's \texttt{3mo} step) & entry quarter \\
+B2 & design & Attributes inner-joined from the latest snapshot only & exit status \\
+B3 & design & Panel balanced on the full calendar, then forward-filled & alteration \\
+B4 & design & Lag and rolling features built, then \texttt{dropna()} on the frame & age / alteration \\
+B5 & design & MASE scale computed on the full series incl.\ test (leak) & alteration \\
+x1 & held-out & Grid built with a 90-day step & calendar (empties panel) \\
+x2 & held-out & Dates rolled forward with \texttt{QuarterEnd()} (off by one quarter) & calendar keys \\
+x3 & held-out & Keep entities active in the last year (current constituents) & exit status \\
+x4 & held-out & Keep entities with at least 40 quarters of history & history length \\
+x5 & held-out & Next-period target via \texttt{shift(-1)}, then \texttt{dropna} & alteration \\
+x6 & held-out & Many-to-many link table with a stale copy & alteration \\
+x7 & held-out & Winsorize at the 1st/99th percentile & alteration \\
+x8 & held-out & Global z-score & none (benign) \\
+x9 & held-out & Row reshuffle & none (benign) \\
+\bottomrule
+\end{tabular}

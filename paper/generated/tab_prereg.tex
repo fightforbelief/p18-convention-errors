@@ -1,0 +1,63 @@
+\begin{longtable}{llp{0.58\linewidth}l}
+\toprule
+Experiment & ID & Prediction & Outcome \\
+\midrule
+\endhead
+Ledger v1 & v1 & Held-out bhc\_leverage: $\ge$7/8 flags, $\le$1/6 false & pass \\
+Decomposition & D1 & B1 harmful on both cash panels & \textbf{fail} \\
+Decomposition & D2 & $T_3\approx0$ for selection bugs, dominant for alterations & pass \\
+Decomposition & D3 & B1 harm on cash panels exceeds bank\_leverage & \textbf{fail} \\
+Full panels & P1 & Selection bugs: $T_3=0$, ranking forecast exact & pass \\
+Full panels & P2 & B1 CI-harmful on full bank\_leverage but not material & \textbf{fail} \\
+Full panels & P3 & B2, x3 E1-material on all panels & pass \\
+Full panels & P4 & x4 E2-material on $\ge$3 panels & \textbf{fail} \\
+Full panels & P5 & B1 never changes top-1; B3 flips a significant pair & pass \\
+Full panels & P6 & No-refit forecast misses alteration bugs & pass \\
+LLM task 1 explicit & Q1 & $\ge$4/15 pipelines silently deviate & \textbf{fail} \\
+LLM task 1 explicit & Q2 & Ledger: $\ge$60\% sensitivity, no false flags & pass \\
+LLM task 1 explicit & Q3 & Stats check cannot discriminate & vacuous \\
+LLM task 1 explicit & Q4 & Deviations trace to charter rules & vacuous \\
+LLM task 1 explicit & Q5 & Material deviations select on exit/history & vacuous \\
+LLM task 1 explicit & Q6 & Haiku deviates more than Opus & \textbf{fail} \\
+LLM task 1 explicit & Q7 & $T_3=0$ for composition-only deviations & vacuous \\
+LLM task 1 under-spec. & QB1 & $\ge$8/15 diverge & pass \\
+LLM task 1 under-spec. & QB2 & $\ge$3/15 impute & pass \\
+LLM task 1 under-spec. & QB3 & $\ge$3/15 single-snapshot charter & \textbf{fail} \\
+LLM task 1 under-spec. & QB4 & Ledger flags $\ge$60\% of divergences & pass \\
+LLM task 1 under-spec. & QB5 & Some pipeline material on $\ge$2 panels & \textbf{fail} \\
+LLM task 1 under-spec. & QB6 & $T_3=0$ when no value mismatch & \textbf{fail} \\
+LLM task 2 & T2A & $\ge$7/8 explicit pipelines exact & pass \\
+LLM task 2 & R1 & $\ge$15/20 under-specified diverge & pass \\
+LLM task 2 & R2 & $\ge$4/20 lag by rows & \textbf{fail} \\
+LLM task 2 & R3 & $\ge$3/20 use percent change & \textbf{fail} \\
+LLM task 2 & R4 & Some pipeline material on $\ge$2 panels & \textbf{fail} \\
+LLM task 2 & R5 & Same-sign shift in $\ge$75\% of cells & \textbf{fail} \\
+LLM task 2 & R6 & Ledger blind to pure value changes & vacuous \\
+LLM task 2 & C1 & Codex task 1: diverges and interpolates & \textbf{fail} \\
+LLM task 2 & C2 & Codex and Claude shift signs agree & \textbf{fail} \\
+LLM task 3 & S1 & $\ge$5/20 fall for the survivorship trap & \textbf{fail} \\
+LLM task 3 & S2 & Survivorship pipelines are material & vacuous \\
+LLM task 3 & S3 & Ledger flags survivorship pipelines & vacuous \\
+LLM task 3 & S4 & $\ge$7/8 explicit pipelines exact & pass \\
+LLM task 3 & S5 & Survivorship rate differs by family & \textbf{fail} \\
+LLM task 3 & S6 & Selection $\ge$70\% of survivorship shift & vacuous \\
+Ablation & AB0 & Baseline config equals reference & pass \\
+Ablation & AB1 & Interpolation alone $\le$1\% & pass \\
+Ablation & AB2 & Minimum length alone $\le$3\% & \textbf{fail} \\
+Ablation & AB3 & Segment rule drives $\ge$60\% of the shift & \textbf{fail} \\
+Ablation & AB4 & Full config reproduces the LLM shift ($\pm$30\%) & pass \\
+Ablation & AB5 & Shift is $\ge$70\% selection & pass \\
+Ablation & AB6 & Ledger flags segment rule, not L16 & \textbf{fail} \\
+Power plants & N1 & Ledger v1: $\ge$7/8 flags, $\le$1/6 false & pass \\
+Power plants & N2 & B1 not material; B2, x3 material & \textbf{fail} \\
+Power plants & N3 & Selection bugs: $T_3=0$, ranking exact & pass \\
+Power plants & N4 & Monotone minimum-length dose-response & pass \\
+Power plants & N5 & LLM explicit exact, under-specified diverge & pass \\
+Power plants & N6 & Material LLM cells all have min length $>16$ & pass \\
+Mechanism & M1 & Technology mix differs by entry quarter & pass \\
+Mechanism & M2 & Technology FE cut the gap by $\ge$50\% & \textbf{fail} \\
+Mechanism & M3 & Technology explains more than history & pass \\
+Mechanism & M4 & No residual entry-quarter effect ($p>0.05$) & \textbf{fail} \\
+Mechanism & M5 & Between-technology share of B1 selection $\ge$50\% & pass \\
+\bottomrule
+\end{longtable}

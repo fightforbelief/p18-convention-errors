@@ -1,0 +1,18 @@
+bank_cash_liquidity G0_S0_L0 ok key_dev=0.0000
+bank_cash_liquidity G0_S0_L16 ok key_dev=0.0111
+bank_cash_liquidity G0_S0_L20 ok key_dev=0.0168
+bank_cash_liquidity G0_S0_L24 ok key_dev=0.0251
+bank_cash_liquidity G0_S1_L0 ok key_dev=0.0176
+bank_cash_liquidity G0_S1_L16 ok key_dev=0.0292
+bank_cash_liquidity G0_S1_L20 ok key_dev=0.0352
+bank_cash_liquidity G0_S1_L24 ok key_dev=0.0437
+bank_cash_liquidity G1_S0_L0 ok key_dev=0.0008
+bank_cash_liquidity G1_S0_L16 ok key_dev=0.0119
+bank_cash_liquidity G1_S0_L20 ok key_dev=0.0175
+bank_cash_liquidity G1_S0_L24 ok key_dev=0.0258
+bank_cash_liquidity G1_S1_L0 ok key_dev=0.0058
+bank_cash_liquidity G1_S1_L16 ok key_dev=0.0170
+bank_cash_liquidity G1_S1_L20 ok key_dev=0.0228
+bank_cash_liquidity G1_S1_L24 ok key_dev=0.0311
+
+--- stderr ---

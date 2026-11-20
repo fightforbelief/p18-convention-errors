@@ -1,0 +1,8 @@
+bank_leverage G0_S0_L18 ok key_dev=0.0128
+bank_leverage G0_S0_L22 ok key_dev=0.0195
+bank_leverage G0_S0_L28 ok key_dev=0.0342
+bank_leverage G0_S0_L32 ok key_dev=0.0471
+bank_leverage G0_S0_L40 ok key_dev=0.0845
+bank_leverage G0_S0_L48 ok key_dev=0.1229
+
+--- stderr ---

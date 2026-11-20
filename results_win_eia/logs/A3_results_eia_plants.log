@@ -1,0 +1,10 @@
+eia_plants codex_1 ok key_dev=0.0000
+eia_plants codex_2 ok key_dev=0.0000
+eia_plants haiku_1 ok key_dev=0.0000
+eia_plants haiku_2 ok key_dev=0.0000
+eia_plants opus_1 ok key_dev=0.0000
+eia_plants opus_2 ok key_dev=0.0000
+eia_plants sonnet_1 ok key_dev=0.0000
+eia_plants sonnet_2 ok key_dev=0.0000
+
+--- stderr ---

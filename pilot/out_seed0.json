@@ -1,0 +1,164 @@
+{
+ "C0_clean": {
+  "rows_kept": 1.0,
+  "banks_kept": 1.0,
+  "entrant_share_eval": 0.486,
+  "conclusion": {
+   "n_banks": 4000,
+   "delta": -0.7754797359859995,
+   "lo": -0.8470460410790852,
+   "hi": -0.7049226807540737,
+   "winner": "Naive"
+  },
+  "checks": {
+   "schema": true,
+   "stats": true,
+   "ledger": true
+  },
+  "ledger_info": {
+   "provenance_ok": true,
+   "spreads": {
+    "entities_by_entry": 0.0,
+    "entities_by_exit": 0.0,
+    "periods_by_age": 0.0,
+    "periods_by_entry": 0.0,
+    "periods_by_exit": 0.0
+   }
+  }
+ },
+ "B1_grid_3mo_step": {
+  "rows_kept": 0.831,
+  "banks_kept": 0.767,
+  "entrant_share_eval": 0.33,
+  "conclusion": {
+   "n_banks": 3068,
+   "delta": -0.4356573730028697,
+   "lo": -0.5038647245767608,
+   "hi": -0.3690892356178131,
+   "winner": "Naive"
+  },
+  "checks": {
+   "schema": true,
+   "stats": true,
+   "ledger": false
+  },
+  "ledger_info": {
+   "provenance_ok": true,
+   "spreads": {
+    "entities_by_entry": 1.0,
+    "entities_by_exit": 0.01,
+    "periods_by_age": 0.084,
+    "periods_by_entry": 1.0,
+    "periods_by_exit": 0.002
+   }
+  }
+ },
+ "B2_survivor_join": {
+  "rows_kept": 0.806,
+  "banks_kept": 0.712,
+  "entrant_share_eval": 0.496,
+  "conclusion": {
+   "n_banks": 2848,
+   "delta": -0.8550367550938213,
+   "lo": -0.9421840008773636,
+   "hi": -0.7838695597518733,
+   "winner": "Naive"
+  },
+  "checks": {
+   "schema": true,
+   "stats": true,
+   "ledger": false
+  },
+  "ledger_info": {
+   "provenance_ok": true,
+   "spreads": {
+    "entities_by_entry": 0.053,
+    "entities_by_exit": 1.0,
+    "periods_by_age": 0.122,
+    "periods_by_entry": 0.019,
+    "periods_by_exit": 1.0
+   }
+  }
+ },
+ "B3_ffill_balanced": {
+  "rows_kept": 1.139,
+  "banks_kept": 1.0,
+  "entrant_share_eval": 0.486,
+  "conclusion": {
+   "n_banks": 4000,
+   "delta": -1.1195265121186082,
+   "lo": -1.1793144610893425,
+   "hi": -1.0531198375857433,
+   "winner": "Naive"
+  },
+  "checks": {
+   "schema": true,
+   "stats": true,
+   "ledger": false
+  },
+  "ledger_info": {
+   "provenance_ok": false,
+   "spreads": {
+    "entities_by_entry": 0.0,
+    "entities_by_exit": 0.0,
+    "periods_by_age": 0.0,
+    "periods_by_entry": 0.0,
+    "periods_by_exit": 0.0
+   }
+  }
+ },
+ "B4_warmup_dropna": {
+  "rows_kept": 0.872,
+  "banks_kept": 1.0,
+  "entrant_share_eval": 0.463,
+  "conclusion": {
+   "n_banks": 3721,
+   "delta": -0.7097983579962249,
+   "lo": -0.7824738384637201,
+   "hi": -0.6524763459038457,
+   "winner": "Naive"
+  },
+  "checks": {
+   "schema": true,
+   "stats": true,
+   "ledger": false
+  },
+  "ledger_info": {
+   "provenance_ok": true,
+   "spreads": {
+    "entities_by_entry": 0.0,
+    "entities_by_exit": 0.0,
+    "periods_by_age": 1.0,
+    "periods_by_entry": 0.074,
+    "periods_by_exit": 0.076
+   }
+  }
+ },
+ "B5_mase_scale_leak": {
+  "rows_kept": 1.0,
+  "banks_kept": 1.0,
+  "entrant_share_eval": 0.486,
+  "conclusion": {
+   "n_banks": 4000,
+   "delta": -0.780164683756536,
+   "lo": -0.838111279124819,
+   "hi": -0.7171433242902255,
+   "winner": "Naive"
+  },
+  "checks": {
+   "schema": true,
+   "stats": true,
+   "ledger": true
+  },
+  "ledger_info": {
+   "provenance_ok": true,
+   "spreads": {
+    "entities_by_entry": 0.0,
+    "entities_by_exit": 0.0,
+    "periods_by_age": 0.0,
+    "periods_by_entry": 0.0,
+    "periods_by_exit": 0.0
+   }
+  }
+ }
+}

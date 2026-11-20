@@ -1,0 +1,74 @@
+[
+ {
+  "pipeline": "C0_clean",
+  "rep": 0,
+  "model": "sonnet",
+  "reply": "Not logged in \u00b7 Please run /login"
+ },
+ {
+  "pipeline": "C0_clean",
+  "rep": 1,
+  "model": "sonnet",
+  "reply": "Not logged in \u00b7 Please run /login"
+ },
+ {
+  "pipeline": "B1_grid_3mo_step",
+  "rep": 0,
+  "model": "sonnet",
+  "reply": "Not logged in \u00b7 Please run /login"
+ },
+ {
+  "pipeline": "B1_grid_3mo_step",
+  "rep": 1,
+  "model": "sonnet",
+  "reply": "Not logged in \u00b7 Please run /login"
+ },
+ {
+  "pipeline": "B2_survivor_join",
+  "rep": 0,
+  "model": "sonnet",
+  "reply": "Not logged in \u00b7 Please run /login"
+ },
+ {
+  "pipeline": "B2_survivor_join",
+  "rep": 1,
+  "model": "sonnet",
+  "reply": "Not logged in \u00b7 Please run /login"
+ },
+ {
+  "pipeline": "B3_ffill_balanced",
+  "rep": 0,
+  "model": "sonnet",
+  "reply": "Not logged in \u00b7 Please run /login"
+ },
+ {
+  "pipeline": "B3_ffill_balanced",
+  "rep": 1,
+  "model": "sonnet",
+  "reply": "Not logged in \u00b7 Please run /login"
+ },
+ {
+  "pipeline": "B4_warmup_dropna",
+  "rep": 0,
+  "model": "sonnet",
+  "reply": "Not logged in \u00b7 Please run /login"
+ },
+ {
+  "pipeline": "B4_warmup_dropna",
+  "rep": 1,
+  "model": "sonnet",
+  "reply": "Not logged in \u00b7 Please run /login"
+ },
+ {
+  "pipeline": "B5_mase_scale_leak",
+  "rep": 0,
+  "model": "sonnet",
+  "reply": "Not logged in \u00b7 Please run /login"
+ },
+ {
+  "pipeline": "B5_mase_scale_leak",
+  "rep": 1,
+  "model": "sonnet",
+  "reply": "Not logged in \u00b7 Please run /login"
+ }
+]
